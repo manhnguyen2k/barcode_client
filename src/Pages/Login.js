@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import "./styles.css";
 import axios from "axios";
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,9 +15,9 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     //console.log(isLogin)
-    useEffect(()=>{
+    useEffect(() => {
         console.log(isLogin)
-    },[isLogin])
+    }, [isLogin])
     // User Login info
     const database = [
         {
@@ -42,25 +42,25 @@ const Login = () => {
             username: username,
             passwd: passwd
         }
-        axios.post("http://tractorserver.myddns.me:3000/auth/login", dataBarcode)
-        .then((data)=>{
-            console.log(data)
-            if(data.data.code===200){
-                dispatch(setLoginStatus(true));
-                //dispatch(setToken(data.data.token));
-                //dispatch(setUid(data.data.uid))
-                localStorage.setItem("token",data.data.token)
-                localStorage.setItem("uid",data.data.uid)
-                navigate('/barcode' );
-            }
-            else if(data.data.code===500){
-                alert("Thông tin đăng nhập không đúng!")
-            }
-            
-        })
-        .catch((err)=>{
-            console.error(err)
-        })
+        axios.post("https://tractorserver.myddns.me:8000/auth/login", dataBarcode)
+            .then((data) => {
+                console.log(data)
+                if (data.data.code === 200) {
+                    dispatch(setLoginStatus(true));
+                    //dispatch(setToken(data.data.token));
+                    //dispatch(setUid(data.data.uid))
+                    localStorage.setItem("token", data.data.token)
+                    localStorage.setItem("uid", data.data.uid)
+                    navigate('/barcode');
+                }
+                else if (data.data.code === 500) {
+                    alert("Thông tin đăng nhập không đúng!")
+                }
+
+            })
+            .catch((err) => {
+                console.error(err)
+            })
     };
 
     // Generate JSX code for error message
@@ -75,12 +75,12 @@ const Login = () => {
             <form onSubmit={handleSubmit}>
                 <div className="input-container">
                     <label>Username </label>
-                    <input type="text" name="uname" required onChange={(e)=>setUsername(e.target.value)} />
+                    <input type="text" name="uname" required onChange={(e) => setUsername(e.target.value)} />
                     {renderErrorMessage("uname")}
                 </div>
                 <div className="input-container">
                     <label>Password </label>
-                    <input type="password" name="pass" required onChange={(e)=>setPasswd(e.target.value)} />
+                    <input type="password" name="pass" required onChange={(e) => setPasswd(e.target.value)} />
                     {renderErrorMessage("pass")}
                 </div>
                 <div className="button-container">
