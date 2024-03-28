@@ -68,7 +68,7 @@ const Barcode1 = () => {
                 },
             };
             try {
-                axios.post("http://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
+                axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
                     .then((res) => {
                         if (res.data.code === 200) {
                             //setCode(data.data)
@@ -156,7 +156,7 @@ const Barcode1 = () => {
             },
         };
         try {
-            const data = await axios.post("http://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
+            const data = await axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
             // console.log(data.data)
 
             if (data.data) {
@@ -247,7 +247,7 @@ const Barcode1 = () => {
             return
         }
         try {
-            const data = await axios.get(`http://tractorserver.myddns.me:8000/barcode/read?code=${barcode}`, config)
+            const data = await axios.get(`https://barcodeserver-latest-b6nu.onrender.com/barcode/read?code=${barcode}`, config)
             // console.log(data)
             if (data.data) {
                 // console.log(data.data.methodcode)

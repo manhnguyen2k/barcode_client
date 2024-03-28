@@ -42,7 +42,7 @@ const Login = () => {
             username: username,
             passwd: passwd
         }
-        axios.post("http://tractorserver.myddns.me:8000/auth/login", dataBarcode)
+        axios.post("https://barcodeserver-latest-b6nu.onrender.com/auth/login", dataBarcode)
             .then((data) => {
                 console.log(data)
                 if (data.data.code === 200) {
