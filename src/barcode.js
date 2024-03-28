@@ -68,7 +68,7 @@ const Barcode1 = () => {
                 },
             };
             try {
-                axios.post("https://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
+                axios.post("http://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
                     .then((res) => {
                         if (res.data.code === 200) {
                             //setCode(data.data)
@@ -156,7 +156,7 @@ const Barcode1 = () => {
             },
         };
         try {
-            const data = await axios.post("https://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
+            const data = await axios.post("http://tractorserver.myddns.me:8000/barcode/genator", dataBarcode, config)
             // console.log(data.data)
 
             if (data.data) {
@@ -247,10 +247,10 @@ const Barcode1 = () => {
             return
         }
         try {
-            const data = await axios.get(`https://tractorserver.myddns.me:8000/barcode/read?code=${barcode}`, config)
-            console.log(data)
+            const data = await axios.get(`http://tractorserver.myddns.me:8000/barcode/read?code=${barcode}`, config)
+            // console.log(data)
             if (data.data) {
-                console.log(data.data.methodcode)
+                // console.log(data.data.methodcode)
                 setBarcodeInfo({
                     companycode: data.data.companycode,
                     methodcode: data.data.methodecode,
@@ -261,7 +261,7 @@ const Barcode1 = () => {
                     date: data.data.date
                 })
             }
-            console.log(barcodeInfo.methodcode)
+            // console.log(barcodeInfo.methodcode)
         } catch (error) {
             console.error(error)
         }
@@ -369,8 +369,8 @@ const Barcode1 = () => {
                             <option value={20}>ALT (GPT)</option>
                             <option value={5}>AMY (alpha - Amylase)</option>
                             <option value={19}>AST (GOT)</option>
-                            <option value={62}>BIL-D (Bilirubin Direct)</option>
-                            <option value={63}>BIL-T (Bilirubin Total)</option>
+                            <option value={6}>BIL-D (Bilirubin Direct)</option>
+                            <option value={7}>BIL-T (Bilirubin Total)</option>
                             <option value={10}>TC (Total Cholesterol)</option>
                             <option value={13}>CK-MB</option>
                             <option value={35}>CRE (Creatinine)</option>
@@ -389,7 +389,14 @@ const Barcode1 = () => {
                             <option value={25}>LDH</option>
 
                         </select>
+
+
+                        <span >Code  : {formatNumber(methodCode)}  </span>
                         <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
+
+
+
+
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
@@ -561,8 +568,8 @@ const Barcode1 = () => {
                             <option value={20}>ALT (GPT)</option>
                             <option value={5}>AMY (alpha - Amylase)</option>
                             <option value={19}>AST (GOT)</option>
-                            <option value={62}>BIL-D (Bilirubin Direct)</option>
-                            <option value={63}>BIL-T (Bilirubin Total)</option>
+                            <option value={6}>BIL-D (Bilirubin Direct)</option>
+                            <option value={7}>BIL-T (Bilirubin Total)</option>
                             <option value={10}>TC (Total Cholesterol)</option>
                             <option value={13}>CK-MB</option>
                             <option value={35}>CRE (Creatinine)</option>
@@ -581,6 +588,7 @@ const Barcode1 = () => {
                             <option value={25}>LDH</option>
 
                         </select>
+                        <span >Code  : {formatNumber(methodCode)}  </span>
                         <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
                     </div>
                     <div className="barcode_item">
@@ -691,35 +699,46 @@ const Barcode1 = () => {
     )
 }
 
+
+
+
+function formatNumber(num) {
+    if (num >= 1 && num <= 9) {
+        return "0" + num;
+    } else {
+        return num.toString();
+    }
+}
+
 function getMethodNameByCode(code) {
     const methodOptions = [
-        { value: "01", label: 'ALB (Albumin)' },
-        { value: "20", label: 'ALTGPT (ALT)' },
-        { value: "05", label: 'AMY_IF (Amylase)' },
-        { value: "19", label: 'ASTGOT (AST)' },
-        { value: "48", label: 'BIL-Dv' },
-        { value: "49", label: 'BIL-Tv' },
-        { value: "10", label: 'TC-CHO (Total Cholesterol)' },
-        { value: "13", label: 'CK-MB' },
-        { value: "15", label: 'CRE_Ja' },
-        { value: "36", label: 'CRP' },
-        { value: "08", label: 'Ca_A3' },
-        { value: "16", label: 'GGT' },
-        { value: "17", label: 'GNU_HK' },
-        { value: "11", label: 'HDL-C (HDL-Cholesterol)' },
-        { value: "12", label: 'LDN-C (LDL-Cholesterol)' },
-        { value: "30", label: 'TG (Total Triglycerides)' },
-        { value: "29", label: 'TP (Total Protein)' },
-        { value: "32", label: 'UA (Uric Acid)' },
-        { value: "31", label: 'UREA (Urea)' },
-        { value: "37", label: 'HbA1c' },
-        { value: "02", label: 'ALP' },
-        { value: "14", label: 'CK' },
-        { value: "35", label: 'CRE (Creatinine)' },
-        { value: "62", label: 'D-BIL (Direct Bilirubin)' },
-        { value: "18", label: 'GLU (Glucose)' },
-        { value: "25", label: 'LDH (Lactate Dehydrogenase)' },
-        { value: "63", label: 'T-BIL (Total Bilirubin)' },
+        { value: 1, label: 'ALB (Albumin)' },
+        { value: 20, label: 'ALTGPT (ALT)' },
+        { value: 5, label: 'AMY_IF (Amylase)' },
+        { value: 19, label: 'ASTGOT (AST)' },
+        { value: 48, label: 'BIL-Dv' },
+        { value: 49, label: 'BIL-Tv' },
+        { value: 10, label: 'TC-CHO (Total Cholesterol)' },
+        { value: 13, label: 'CK-MB' },
+        { value: 15, label: 'CRE_Ja' },
+        { value: 36, label: 'CRP' },
+        { value: 8, label: 'Ca_A3' },
+        { value: 16, label: 'GGT' },
+        { value: 17, label: 'GNU_HK' },
+        { value: 11, label: 'HDL-C (HDL-Cholesterol)' },
+        { value: 12, label: 'LDN-C (LDL-Cholesterol)' },
+        { value: 30, label: 'TG (Total Triglycerides)' },
+        { value: 29, label: 'TP (Total Protein)' },
+        { value: 32, label: 'UA (Uric Acid)' },
+        { value: 31, label: 'UREA (Urea)' },
+        { value: 37, label: 'HbA1c' },
+        { value: 2, label: 'ALP' },
+        { value: 14, label: 'CK' },
+        { value: 35, label: 'CRE (Creatinine)' },
+        { value: 6, label: 'BIL-D (Bilirubin Direct)' },
+        { value: 18, label: 'GLU (Glucose)' },
+        { value: 25, label: 'LDH (Lactate Dehydrogenase)' },
+        { value: 7, label: 'BIL-T (Bilirubin Total)' },
     ];
 
     const selectedMethod = methodOptions.find(method => method.value.toString() === code.toString());
@@ -792,8 +811,8 @@ function getMethodNameByValue(value) {
         { value: 20, label: 'ALT (GPT)' },
         { value: 5, label: 'AMY (alpha - Amylase)' },
         { value: 19, label: 'AST (GOT)' },
-        { value: 62, label: 'BIL-D (Bilirubin Direct)' },
-        { value: 63, label: 'BIL-T (Bilirubin Total)' },
+        { value: 6, label: 'BIL-D (Bilirubin Direct)' },
+        { value: 7, label: 'BIL-T (Bilirubin Total)' },
         { value: 10, label: 'TC (Total Cholesterol)' },
         { value: 13, label: 'CK-MB' },
         { value: 35, label: 'CRE (Creatinine)' },

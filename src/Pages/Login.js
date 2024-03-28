@@ -42,7 +42,7 @@ const Login = () => {
             username: username,
             passwd: passwd
         }
-        axios.post("https://tractorserver.myddns.me:8000/auth/login", dataBarcode)
+        axios.post("http://tractorserver.myddns.me:8000/auth/login", dataBarcode)
             .then((data) => {
                 console.log(data)
                 if (data.data.code === 200) {
