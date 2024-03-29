@@ -10,16 +10,20 @@ const initialState = {
 const authReducer = (state = initialState, action) => {
   switch (action.type) {
     case SET_LOGIN_STATUS:
+       
+        localStorage.setItem("isLogin",action.payload)
       return {
         ...state,
         isLogin: action.payload,
       };
       case SET_UID:
+        localStorage.setItem("uid",action.payload)
         return {
           ...state,
           uid: action.payload,
         };
       case SET_TOKEN:
+        localStorage.setItem("token",action.payload)
       return {
         ...state,
         token: action.payload,

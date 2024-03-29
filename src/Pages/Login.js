@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./styles.css";
 import axios from "axios";
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, } from 'react-router-dom';
 
 
 import { setLoginStatus, setToken, setUid } from '../redux/actions/auth';
@@ -15,25 +15,6 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     //console.log(isLogin)
-    useEffect(() => {
-        console.log(isLogin)
-    }, [isLogin])
-    // User Login info
-    const database = [
-        {
-            username: "user1",
-            password: "pass1"
-        },
-        {
-            username: "user2",
-            password: "pass2"
-        }
-    ];
-
-    const errors = {
-        uname: "invalid username",
-        pass: "invalid password"
-    };
 
     const handleSubmit = (event) => {
         //Prevent page reload
@@ -47,10 +28,11 @@ const Login = () => {
                 console.log(data)
                 if (data.data.code === 200) {
                     dispatch(setLoginStatus(true));
-                    //dispatch(setToken(data.data.token));
-                    //dispatch(setUid(data.data.uid))
-                    localStorage.setItem("token", data.data.token)
-                    localStorage.setItem("uid", data.data.uid)
+                    dispatch(setToken(data.data.token));
+                    dispatch(setUid(data.data.uid))
+                 //   localStorage.setItem("isLogin", true)
+                   // localStorage.setItem("token", data.data.token)
+                    //localStorage.setItem("uid", data.data.uid)
                     navigate('/barcode');
                 }
                 else if (data.data.code === 500) {
