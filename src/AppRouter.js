@@ -11,7 +11,7 @@ const AppRouter = () => {
     //console.log(isLogin)
   return (
     <Routes>
-    <Route exact path="/" element={isLogin? <Navigate to="/barcode" /> : <Login />} />
+    <Route exact path="/" element={ <Login />} />
     <Route path="/barcode" element={isLogin  ? <Barcode1 /> : <Navigate to="/" />} />
   </Routes>
   
