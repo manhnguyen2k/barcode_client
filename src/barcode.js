@@ -10,10 +10,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import Barcode from 'react-jsbarcode';
 const Barcode1 = () => {
     const [companyCode, setCompanyCode] = useState(1)
+    const [BeckmanCode,setBeckmancode] = useState()
     const [methodCode, setMethodCode] = useState(1)
     const [machineCode, setMechineCode] = useState(1)
     const [BeckmanmethodCode, setBeckmanMethodCode] = useState('002')
-    const [BeckmanBottleSize, setBeckmanBottleSize] = useState('01')
+    const [BeckmanBottleSize, setBeckmanBottleSize] = useState('03')
     const [BeckmanLotnumber, setBeckmanLotnumber] = useState(0)
     const [BeckmanType, setBeckmanType] = useState('1')
     const [BeckmanMonth, setBeckmanMonth] = useState(1)
@@ -135,14 +136,12 @@ const exportToExcel2 = ()=>{
     const handleSubmit1 = ()=>{
         console.log(11111)
         const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
-        setCode(`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`)
+        setBeckmancode(`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`)
         
         setIsExport1(true)
     }
 
-useEffect(()=>{
-    console.log(code)
-},[code])
+
 
     const handleSubmit = async () => {
         const err_arr = []
@@ -568,7 +567,7 @@ useEffect(()=>{
                         </select>}
                         {machineCode==2 &&
                              <select value={BeckmanBottleSize} onChange={(e) => setBeckmanBottleSize(e.target.value)}>
-                            <option value={'01'}>30ml</option>
+                            
                             <option value={'03'}>70ml</option>
                             <option value={'05'}>20ml</option>
                         </select>
@@ -663,23 +662,26 @@ useEffect(()=>{
 
 
                     </div>
-                    {isExport &&
+                    {isExport1 && machineCode==2&&
+                        <div className="barcode_item" >
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Mã code: {BeckmanCode}</span>
+                            <span class="tooltip1" data-tooltip="Copy Number Code " data-tooltip-pos="up" data-tooltip-length="medium"> <ContentPasteIcon onClick={() => handleCopy(BeckmanCode)} style={{ cursor: "pointer" }} /></span>
+
+                        </div>}
+                    {isExport&&machineCode==1 &&
                         <div className="barcode_item" >
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Ngày hết hạn ước tính (ngày-tháng-năm): {convertDateStringToCustomFormat(code?.date)}</span>
                         </div>}
-                        {isExport1 &&
-                        <div className="barcode_item" >
-                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Mã code: {code}</span>
-                        </div>}
+                       
 
                     <div className="barcode_item barcode_render_contain" style={{ "margin": "auto" }} >
-                        {isExport &&
+                        {isExport && machineCode==1&&
                             <select style={{ width: "100px", marginBottom: "10px" }} value={changeImage} onChange={(e) => setChangeImage(e.target.value)}>
                                 <option value={1}>Js Barcode </option>
                                 <option value={2}>Tec-it</option>
                             </select>}
 
-                        {code?.data?.length !== 0 && code?.data?.map((item, index) => (
+                        {code?.data?.length !== 0&&machineCode==1 && code?.data?.map((item, index) => (
                             <div key={index} className="barcode_render">
                                 <div className="barcode_render_img" >
                                     <LazyLoadComponent delayTime={200}>
@@ -849,7 +851,7 @@ useEffect(()=>{
                         </select>}
                         {machineCode==2 &&
                              <select value={BeckmanBottleSize} onChange={(e) => setBeckmanBottleSize(e.target.value)}>
-                            <option value={'01'}>30ml</option>
+                          
                             <option value={'03'}>70ml</option>
                             <option value={'05'}>20ml</option>
                         </select>
