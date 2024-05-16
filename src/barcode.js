@@ -11,6 +11,17 @@ import Barcode from 'react-jsbarcode';
 const Barcode1 = () => {
     const [companyCode, setCompanyCode] = useState(1)
     const [methodCode, setMethodCode] = useState(1)
+    const [machineCode, setMechineCode] = useState(1)
+    const [BeckmanmethodCode, setBeckmanMethodCode] = useState('002')
+    const [BeckmanBottleSize, setBeckmanBottleSize] = useState('01')
+    const [BeckmanLotnumber, setBeckmanLotnumber] = useState(0)
+    const [BeckmanType, setBeckmanType] = useState('1')
+    const [BeckmanMonth, setBeckmanMonth] = useState(1)
+    const [BeckmanYear, setBeckmanYear] = useState(0)
+    const [BeckmanLot, setBeckmanLot] = useState('0000')
+    const [BeckmanNumber, setBeckmanNumber] = useState('0001')
+    const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
+    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
     const [bottleSizeCode, setBottleSizeCode] = useState(1)
     const [reagentType, setReagentType] = useState(0)
     const [expiryYear, setExpiryYear] = useState(0)
@@ -32,6 +43,7 @@ const Barcode1 = () => {
     const [dataExel, setDataExel] = useState([])
     const [isCopy, setIsCopy] = useState(false);
     const [isExport, setIsExport] = useState(false);
+    const [isExport1, setIsExport1] = useState(false);
     const [reloadClicked, setReloadClicked] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [changeImage, setChangeImage] = useState("1");
@@ -40,6 +52,7 @@ const Barcode1 = () => {
     const token = localStorage.getItem("token")
     const uid = localStorage.getItem("uid")
     //console.log(token)
+
     const exportToExcel = async () => {
         try {
 
@@ -72,7 +85,7 @@ const Barcode1 = () => {
                     .then((res) => {
                         if (res.data.code === 200) {
                             //setCode(data.data)
-
+                            console.log(res.data.data)
                             if (res.data.data !== null || res.data.data.length != 0) {
                                 const data = transformArray(res.data.data);
                                 const ws = XLSX.utils.json_to_sheet(data);
@@ -103,6 +116,33 @@ const Barcode1 = () => {
             alert('Đã xảy ra lỗi khi ghi file Excel!');
         }
     };
+
+const exportToExcel2 = ()=>{
+    const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
+    const arr=[]
+   for(let i =parseInt(BeckmanminNumber); i<=parseInt(BeckmanmaxNumber); i++){
+    arr.push({bottleLot: i, code:`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(i)}`})
+   }
+   const data = transformArray(arr);
+   const ws = XLSX.utils.json_to_sheet(data);
+   const wb = XLSX.utils.book_new();
+   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+   XLSX.writeFile(wb, `data.xlsx`);
+   alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
+   // console.log(BeckmanmethodCode,BeckmanBottleSize,reagentTypeCode,calculateMonthYear(day,BeckmanMonth),BeckmanLot,`0${BeckmanminNumber}`,`0${BeckmanmaxNumber}`)
+}
+    
+    const handleSubmit1 = ()=>{
+        console.log(11111)
+        const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
+        setCode(`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`)
+        
+        setIsExport1(true)
+    }
+
+useEffect(()=>{
+    console.log(code)
+},[code])
 
     const handleSubmit = async () => {
         const err_arr = []
@@ -341,6 +381,78 @@ const Barcode1 = () => {
 
         }
     }, [methodCode])
+    useEffect(() => {
+        switch (BeckmanmethodCode) {
+            case "002":
+                setBeckmanMonth(24)
+                break;
+            case "007":
+                setBeckmanMonth(18)
+                break;
+            case "006":
+                setBeckmanMonth(18)
+                break;
+
+            case "009":
+                setBeckmanMonth(18)
+                break;
+            case "034":
+                setBeckmanMonth(18)
+                break;
+            case "098":
+                setBeckmanMonth(24)
+                break;
+            case "032":
+                setBeckmanMonth(24)
+                break;
+            case "004":
+                setBeckmanMonth(18)
+                break;
+            case "079":
+                setBeckmanMonth(12)
+                break;
+            case "155":
+                setBeckmanMonth(18)
+                break;
+            case "047":
+                setBeckmanMonth(12)
+                break;
+            case "011":
+                setBeckmanMonth(18)
+                break;
+            case "020":
+                setBeckmanMonth(18)
+                break;
+            case "021":
+                setBeckmanMonth(12)
+                break;
+            case "087":
+                setBeckmanMonth(18)
+                break;
+            case "026":
+                setBeckmanMonth(18)
+                break;
+            case "083":
+                setBeckmanMonth(18)
+                break;
+            case "012":
+                setBeckmanMonth(18)
+                break;
+            case "016":
+                setBeckmanMonth(18)
+                break;
+            case "118":
+                setBeckmanMonth(18)
+                break;
+            
+            default:
+                setBeckmanMonth(24)
+
+        }
+    }, [BeckmanmethodCode])
+    useEffect(()=>{
+        console.log(BeckmanmethodCode)
+    },[BeckmanmethodCode])
     return (
         <div className="container">
             <div >
@@ -352,9 +464,19 @@ const Barcode1 = () => {
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
                 <div onClick={() => setSelectedTab(2)} className={`tab_container-item ${selectedTab == 2 && "active"}`}>Tạo nhiều mã</div>
                 <div onClick={() => setSelectedTab(3)} className={`tab_container-item ${selectedTab == 3 && "active"}`}>Đọc</div>
+                <div onClick={() => setSelectedTab(4)} className={`tab_container-item ${selectedTab == 4 && "active"}`}>Tạo mã Beckman</div>
             </div>
             {selectedTab == 1 &&
                 <div className="container_barcode">
+                     <div className="barcode_item">
+                     <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Loại máy</span>
+                         <select value={machineCode} onChange={(e) => setMechineCode(e.target.value)}>
+                              <option value={1}>Furuno CA</option>
+                            <option value={2}>Beckman coulter AU</option>
+                           
+                         
+                         </select>
+                     </div>
                     {/*
                         <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Company Code (Không đổi)</span>
@@ -362,8 +484,9 @@ const Barcode1 = () => {
                     </div>
                     */}
 
-                    <div className="barcode_item">
+<div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
+                        {machineCode ==1 && 
                         <select value={methodCode} onChange={(e) => setMethodCode(e.target.value)}>
                             <option value={1}>ALB (Albumin)</option>
                             <option value={20}>ALT (GPT)</option>
@@ -388,22 +511,68 @@ const Barcode1 = () => {
                             <option value={18}>GLU (Glucose)</option>
                             <option value={25}>LDH</option>
 
+                        </select>}
+                        {machineCode ==2 &&
+                            <select value={BeckmanmethodCode} onChange={(e) => setBeckmanMethodCode(e.target.value)}>
+                            <option value={'002'}>ALB</option>
+                            <option value={'034'}>UN</option>
+                            <option value={'007'}>ALT</option>
+                            <option value={'009'}>AST</option>
+                            <option value={'098'}>UA</option>
+                            <option value={'032'}>TP</option>
+                            <option value={'004'}>ALP</option>
+                            <option value={'006'}>AMY</option>
+                            <option value={'079'}>CK</option>
+                            <option value={'155'}>CK-MB</option>
+                            <option value={'078'}>CRE</option>
+                            <option value={'047'}>CRP</option>
+                            <option value={'011'}>DBIL</option>
+                            <option value={'020'}>GGT</option>
+                            <option value={'021'}>GLU</option>
+                            <option value={'087'}>HDL</option>
+                            <option value={'026'}>LDH</option>
+                            <option value={'083'}>LDL</option>
+                            <option value={'012'}>TBIL</option>
+                            <option value={'016'}>TC</option>
+                            <option value={'118'}>TG</option>
+                            
+
                         </select>
 
-
+                        }
+                         {machineCode ==1 &&
+                        <>
                         <span >Code  : {formatNumber(methodCode)}  </span>
                         <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
 
+                        </>
+                           
 
+                        }
+                         {machineCode ==2 &&
+                        <>
+                        <span >Code  : {BeckmanmethodCode}  </span>
+                        <span >Tháng hết hạn của {getMethodName(BeckmanmethodCode)} : {BeckmanMonth} tháng!</span>
 
+                        </>
+                           
 
+                        }
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
+                        {machineCode==1&&
                         <select value={bottleSizeCode} onChange={(e) => setBottleSizeCode(e.target.value)}>
                             <option value={1}>20ml (square)</option>
                             <option value={3}>70ml</option>
+                        </select>}
+                        {machineCode==2 &&
+                             <select value={BeckmanBottleSize} onChange={(e) => setBeckmanBottleSize(e.target.value)}>
+                            <option value={'01'}>30ml</option>
+                            <option value={'03'}>70ml</option>
+                            <option value={'05'}>20ml</option>
                         </select>
+                        }
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
@@ -414,11 +583,11 @@ const Barcode1 = () => {
                     </div>
                     {/**  <div className="barcode_item" style={{ display: "none" }}>
 
-                        <select value={selectExpiryType} onChange={(e) => setSelectExpiryType(e.target.value)}>
-                            <option value={1}>Thời gian chính xác</option>
-                            <option value={2}>Từ thời gian sản xuất</option>
-                        </select>
-                    </div> */}
+                    <select value={selectExpiryType} onChange={(e) => setSelectExpiryType(e.target.value)}>
+                        <option value={1}>Thời gian chính xác</option>
+                        <option value={2}>Từ thời gian sản xuất</option>
+                    </select>
+                </div> */}
 
 
 
@@ -427,15 +596,15 @@ const Barcode1 = () => {
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Ngày sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" required value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Tháng sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" required value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Năm sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" required value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
                             </div>
                             <button onClick={handleSetToday} style={{ "width": "70px", }}>Hôm nay</button>
                         </div>
@@ -443,13 +612,28 @@ const Barcode1 = () => {
 
 
                     <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
-                        <input type="text" required value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
+                        {machineCode==1&&<>
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
+                        <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
+                        </>}
+                        {machineCode==2&&<>
+                        
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
+                        <input type="text" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
+                        </>}
+                       
                     </div>
                     <div className="barcode_item">
+                       {machineCode==1&&<>
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
                         </span>
                         <input type="number" required min={0} value={minSequenceNumber_once} onChange={handleMinchange_once}></input>
+                       </>}
+                       {machineCode==2&&<>
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số SEQ:
+                        </span>
+                        <input type="number" required min={0} value={BeckmanNumber} onChange={(e)=>setBeckmanNumber(e.target.value)}></input>
+                       </>}
                         {/**
                          *  <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -465,7 +649,13 @@ const Barcode1 = () => {
 
                     </div>
                     <div className="barcode_item" style={{ "width": "150px", "margin": "auto", }}>
-                        <button style={{ marginBottom: "10px" }} onClick={handleSubmit}>Tạo mã</button>
+                        {
+                        machineCode==1&&
+                         <button style={{ marginBottom: "10px" }} onClick={handleSubmit}>Tạo mã</button>
+                        }
+                        {machineCode==2&&
+                         <button style={{ marginBottom: "10px" }} onClick={handleSubmit1}>Tạo mã</button>}
+                       
 
                         {/** 
                         * {isExport && <button onClick={exportToExcel}>Xuất File Exels</button>}
@@ -477,7 +667,10 @@ const Barcode1 = () => {
                         <div className="barcode_item" >
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Ngày hết hạn ước tính (ngày-tháng-năm): {convertDateStringToCustomFormat(code?.date)}</span>
                         </div>}
-
+                        {isExport1 &&
+                        <div className="barcode_item" >
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Mã code: {code}</span>
+                        </div>}
 
                     <div className="barcode_item barcode_render_contain" style={{ "margin": "auto" }} >
                         {isExport &&
@@ -560,9 +753,21 @@ const Barcode1 = () => {
                     <input type="text" value={companyCode} onChange={(e) => setCompanyCode(e.target.value)}></input>
                 </div>
                 */}
+                     <div className="barcode_item">
+                     <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Loại máy</span>
+                         <select value={machineCode} onChange={(e) => setMechineCode(e.target.value)}>
+                              <option value={1}>Furuno CA</option>
+                            <option value={2}>Beckman coulter AU</option>
+                           
+                         
+                         </select>
+                     </div>
 
+
+                    
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
+                        {machineCode ==1 && 
                         <select value={methodCode} onChange={(e) => setMethodCode(e.target.value)}>
                             <option value={1}>ALB (Albumin)</option>
                             <option value={20}>ALT (GPT)</option>
@@ -587,16 +792,68 @@ const Barcode1 = () => {
                             <option value={18}>GLU (Glucose)</option>
                             <option value={25}>LDH</option>
 
+                        </select>}
+                        {machineCode ==2 &&
+                            <select value={BeckmanmethodCode} onChange={(e) => setBeckmanMethodCode(e.target.value)}>
+                            <option value={'002'}>ALB</option>
+                            <option value={'034'}>UN</option>
+                            <option value={'007'}>ALT</option>
+                            <option value={'009'}>AST</option>
+                            <option value={'098'}>UA</option>
+                            <option value={'032'}>TP</option>
+                            <option value={'004'}>ALP</option>
+                            <option value={'006'}>AMY</option>
+                            <option value={'079'}>CK</option>
+                            <option value={'155'}>CK-MB</option>
+                            <option value={'078'}>CRE</option>
+                            <option value={'047'}>CRP</option>
+                            <option value={'011'}>DBIL</option>
+                            <option value={'020'}>GGT</option>
+                            <option value={'021'}>GLU</option>
+                            <option value={'087'}>HDL</option>
+                            <option value={'026'}>LDH</option>
+                            <option value={'083'}>LDL</option>
+                            <option value={'012'}>TBIL</option>
+                            <option value={'016'}>TC</option>
+                            <option value={'118'}>TG</option>
+                            
+
                         </select>
+
+                        }
+                         {machineCode ==1 &&
+                        <>
                         <span >Code  : {formatNumber(methodCode)}  </span>
                         <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
+
+                        </>
+                           
+
+                        }
+                         {machineCode ==2 &&
+                        <>
+                        <span >Code  : {BeckmanmethodCode}  </span>
+                        <span >Tháng hết hạn của {getMethodName(BeckmanmethodCode)} : {BeckmanMonth} tháng!</span>
+
+                        </>
+                           
+
+                        }
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
+                        {machineCode==1&&
                         <select value={bottleSizeCode} onChange={(e) => setBottleSizeCode(e.target.value)}>
                             <option value={1}>20ml (square)</option>
                             <option value={3}>70ml</option>
+                        </select>}
+                        {machineCode==2 &&
+                             <select value={BeckmanBottleSize} onChange={(e) => setBeckmanBottleSize(e.target.value)}>
+                            <option value={'01'}>30ml</option>
+                            <option value={'03'}>70ml</option>
+                            <option value={'05'}>20ml</option>
                         </select>
+                        }
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
@@ -636,11 +893,20 @@ const Barcode1 = () => {
 
 
                     <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
+                        {machineCode==1&&<>
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
                         <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
+                        </>}
+                        {machineCode==2&&<>
+                        
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
+                        <input type="text" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
+                        </>}
+                       
                     </div>
                     <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
+                        {machineCode ==1&&<>
+                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
                         </span>
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -652,6 +918,22 @@ const Barcode1 = () => {
                                 <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
                             </div>
                         </div>
+                        </>}
+                       {machineCode==2 &&<>
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số SEQ:
+                        </span>
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span>Bắt đầu từ</span>
+                                <input style={{ width: "100px" }} type="number" min={0} value={BeckmanminNumber} onChange={(e)=>setBeckmanMinNumber(e.target.value)}></input>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span>Kết thúc</span>
+                                <input style={{ width: "100px" }} type="number" min={0} value={BeckmanmaxNumber} onChange={(e)=>setBeckmanMaxNumber(e.target.value)}></input>
+                            </div>
+                        </div>
+
+                       </>}
                         {/**<input type="number" min={0} value={minSequenceNumber} onChange={handleMinchange_once}></input> */}
                         {/**
                      * 
@@ -659,8 +941,10 @@ const Barcode1 = () => {
 
                     </div>
                     <div className="barcode_item" style={{ "width": "150px", "margin": "auto", }}>
-                        <button onClick={exportToExcel}>Xuất File Exels</button>
-
+                        {machineCode==1&& <button onClick={exportToExcel}>Xuất File Exels</button>}
+                       
+                        {machineCode==2&& <button onClick={exportToExcel2}>Xuất File Exels</button>}
+                       
                         {/** 
                     * {isExport && }
                    */}
@@ -693,6 +977,52 @@ const Barcode1 = () => {
                 </div>
             }
 
+            {selectedTab ==4 &&
+                <div className="container_barcode">
+                         <div className="barcode_item">
+                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
+                        
+                         </div>
+                         <div className="barcode_item">
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
+                       
+                    </div>
+                    <div className="barcode_item">
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
+                        <select value={BeckmanType} onChange={(e) => setBeckmanType(e.target.value)}>
+                            <option value={'1'}>R1</option>
+                            <option value={'2'}>R2</option>
+                        </select>
+                    </div>
+                    <div className="barcode_item">
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Tháng hết hạn</span>
+                        <input type="number" min={1} max={12} value={BeckmanMonth} onChange={(e)=>setBeckmanMonth(e.target.value)}></input>
+                    </div>
+                    <div className="barcode_item">
+                    <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Năm hết hạn (2 số cuối)</span>
+                        <input type="number" min={1} max={12} value={BeckmanYear} onChange={(e)=>setBeckmanYear(e.target.value)}></input>
+                    </div>
+                    <div className="barcode_item">
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
+                        </span>
+                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span>Bắt đầu từ</span>
+                                <input style={{ width: "100px" }} type="number" min={0} value={minSequenceNumber} onChange={handleMinChange}></input>
+                            </div>
+                            <div style={{ display: "flex", flexDirection: "column" }}>
+                                <span>Kết thúc</span>
+                                <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
+                            </div>
+                        </div>
+                        {/**<input type="number" min={0} value={minSequenceNumber} onChange={handleMinchange_once}></input> */}
+                        {/**
+                     * 
+                     */}
+
+                    </div>
+                </div>
+            }
 
 
         </div>
@@ -700,8 +1030,45 @@ const Barcode1 = () => {
 }
 
 
+function calculateMonthYear(startDate, months) {
+    // Chuyển đổi ngày bắt đầu thành đối tượng Date
+       // Chuyển đổi ngày bắt đầu thành đối tượng Date
+       const date = new Date(startDate);
 
+       // Kiểm tra xem ngày bắt đầu có hợp lệ hay không
+       if (isNaN(date.getTime())) {
+           throw new Error('Ngày bắt đầu không hợp lệ');
+       }
+   
+       // Thêm số tháng vào ngày bắt đầu
+       date.setMonth(date.getMonth() + months);
+   
+       // Lấy ngày mới
+       const newDay = date.getDate();
+       const newMonth = date.getMonth() + 1; // Tháng trong JavaScript bắt đầu từ 0, nên cần cộng thêm 1
+       const newYear = date.getFullYear();
+   
+       // Định dạng tháng để có hai chữ số
+       const formattedMonth = newMonth < 10 ? '0' + newMonth : newMonth;
+   
+       // Định dạng ngày để có hai chữ số
+       const formattedYear = newYear.toString().slice(-2);
+       // Trả về chuỗi dạng "DD/MM/YYYY"
+       return `${formattedMonth}${formattedYear}`;
+   
+}
 
+function padToFiveDigits(number) {
+    // Chuyển đổi số thành chuỗi
+    let numberStr = number.toString();
+
+    // Kiểm tra độ dài của chuỗi và thêm số 0 vào đầu chuỗi cho đến khi độ dài đạt 5
+    while (numberStr.length < 5) {
+        numberStr = '0' + numberStr;
+    }
+
+    return numberStr;
+}
 function formatNumber(num) {
     if (num >= 1 && num <= 9) {
         return "0" + num;
@@ -746,47 +1113,33 @@ function getMethodNameByCode(code) {
     return selectedMethod ? selectedMethod.label : null;
 }
 
-function getBottleSizeNameByCode(code) {
-    const bottleSizeOptions = [
-        { code: "1", name: '20ml (square)' },
-        { code: "7", name: '20ml (round)' },
-        { code: "4", name: '40ml' },
-        { code: "5", name: '50ml' },
-        { code: "3", name: '70ml' },
-        { code: "6", name: '100ml' },
-    ];
+const beckmanMethodMap = {
+    '002': 'ALB',
+    '034': 'UN',
+    '007': 'ALT',
+    '009': 'AST',
+    '098': 'UA',
+    '032': 'TP',
+    '004': 'ALP',
+    '006': 'AMY',
+    '079': 'CK',
+    '155': 'CK-MB',
+    '078': 'CRE',
+    '047': 'CRP',
+    '011': 'DBIL',
+    '020': 'GGT',
+    '021': 'GLU',
+    '087': 'HDL',
+    '026': 'LDH',
+    '083': 'LDL',
+    '012': 'TBIL',
+    '016': 'TC',
+    '118': 'TG'
+};
 
-    const selectedBottleSize = bottleSizeOptions.find(size => size.code.toString() === code.toString());
-
-    return selectedBottleSize ? selectedBottleSize.name : null;
-}
-
-function getReagentTypeNameByCode(code) {
-    const reagentTypeOptions = [
-        { code: "1", name: 'R1' },
-        { code: "2", name: 'R2' },
-        { code: "3", name: 'R3' },
-        { code: "4", name: 'R4' },
-        { code: "5", name: 'DILUENT' },
-        { code: "6", name: 'WASH SOLUTION' },
-    ];
-
-    const selectedReagentType = reagentTypeOptions.find(type => type.code.toString() === code.toString());
-
-    return selectedReagentType ? selectedReagentType.name : null;
-}
-
-function extractSubstring(inputString, a, b) {
-    // console.log(inputString)
-    // Kiểm tra a và b để đảm bảo là số và không âm
-    if (typeof a !== 'number' || typeof b !== 'number' || a < 0 || b < 0) {
-        return "Vui lòng nhập số không âm cho vị trí a và b.";
-    }
-
-    // Trích xuất phần của chuỗi từ vị trí a đến vị trí b
-    const result = inputString.slice(a, b + 1);
-    //console.log(result)
-    return result;
+// Hàm nhận vào một chuỗi giá trị và trả về tên tương ứng
+function getMethodName(value) {
+    return beckmanMethodMap[value] || 'Không tìm thấy tên tương ứng';
 }
 function convertDateStringToCustomFormat(dateString) {
     const originalDate = new Date(dateString);
