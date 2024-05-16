@@ -464,7 +464,7 @@ useEffect(()=>{
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
                 <div onClick={() => setSelectedTab(2)} className={`tab_container-item ${selectedTab == 2 && "active"}`}>Tạo nhiều mã</div>
                 <div onClick={() => setSelectedTab(3)} className={`tab_container-item ${selectedTab == 3 && "active"}`}>Đọc</div>
-                <div onClick={() => setSelectedTab(4)} className={`tab_container-item ${selectedTab == 4 && "active"}`}>Tạo mã Beckman</div>
+               
             </div>
             {selectedTab == 1 &&
                 <div className="container_barcode">
@@ -977,52 +977,7 @@ useEffect(()=>{
                 </div>
             }
 
-            {selectedTab ==4 &&
-                <div className="container_barcode">
-                         <div className="barcode_item">
-                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
-                        
-                         </div>
-                         <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
-                       
-                    </div>
-                    <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
-                        <select value={BeckmanType} onChange={(e) => setBeckmanType(e.target.value)}>
-                            <option value={'1'}>R1</option>
-                            <option value={'2'}>R2</option>
-                        </select>
-                    </div>
-                    <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Tháng hết hạn</span>
-                        <input type="number" min={1} max={12} value={BeckmanMonth} onChange={(e)=>setBeckmanMonth(e.target.value)}></input>
-                    </div>
-                    <div className="barcode_item">
-                    <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Năm hết hạn (2 số cuối)</span>
-                        <input type="number" min={1} max={12} value={BeckmanYear} onChange={(e)=>setBeckmanYear(e.target.value)}></input>
-                    </div>
-                    <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
-                        </span>
-                        <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                            <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span>Bắt đầu từ</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={minSequenceNumber} onChange={handleMinChange}></input>
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span>Kết thúc</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
-                            </div>
-                        </div>
-                        {/**<input type="number" min={0} value={minSequenceNumber} onChange={handleMinchange_once}></input> */}
-                        {/**
-                     * 
-                     */}
-
-                    </div>
-                </div>
-            }
+           
 
 
         </div>
