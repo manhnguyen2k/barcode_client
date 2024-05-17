@@ -134,8 +134,9 @@ const exportToExcel2 = ()=>{
 }
     
     const handleSubmit1 = ()=>{
-        console.log(11111)
+       
         const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
+       // alert(day)
         setBeckmancode(`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`)
         
         setIsExport1(true)
@@ -653,7 +654,7 @@ const exportToExcel2 = ()=>{
                          <button style={{ marginBottom: "10px" }} onClick={handleSubmit}>Tạo mã</button>
                         }
                         {machineCode==2&&
-                         <button style={{ marginBottom: "10px" }} onClick={handleSubmit1}>Tạo mã</button>}
+                         <button style={{ marginBottom: "10px" }} onClick={handleSubmit1}>Tạo mã Benckman</button>}
                        
 
                         {/** 
@@ -1027,10 +1028,11 @@ function padToFiveDigits(number) {
     return numberStr;
 }
 function formatNumber(num) {
-    if (num >= 1 && num <= 9) {
-        return "0" + num;
+    const paNum = parseInt(num)
+    if (paNum >= 1 && paNum <= 9) {
+        return "0" + paNum;
     } else {
-        return num.toString();
+        return paNum.toString();
     }
 }
 
