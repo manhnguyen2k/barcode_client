@@ -33,7 +33,7 @@ const Login = () => {
                  //   localStorage.setItem("isLogin", true)
                    // localStorage.setItem("token", data.data.token)
                     //localStorage.setItem("uid", data.data.uid)
-                    navigate('/barcode');
+                    navigate('/home');
                 }
                 else if (data.data.code === 500) {
                     alert("Thông tin đăng nhập không đúng!")

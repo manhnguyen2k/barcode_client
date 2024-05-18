@@ -61,3 +61,27 @@
     gap: 8px;
     margin: 10px;
   }
+
+
+  .homepage{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Ensures the div takes up the full viewport height */
+  }
+  .select-item{
+    margin: 0 50px; /* Adds some spacing between the items */
+    width: 200px;
+    height: 100px;
+    padding: 20px;
+    font-size: 24px;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content:center ;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+  }
