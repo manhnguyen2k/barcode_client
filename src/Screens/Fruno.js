@@ -118,31 +118,6 @@ const Fruno = () => {
         }
     };
 
-const exportToExcel2 = ()=>{
-    const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
-    const arr=[]
-   for(let i =parseInt(BeckmanminNumber); i<=parseInt(BeckmanmaxNumber); i++){
-    arr.push({bottleLot: i, code:`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(i)}`})
-   }
-   const data = transformArray(arr);
-   const ws = XLSX.utils.json_to_sheet(data);
-   const wb = XLSX.utils.book_new();
-   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-   XLSX.writeFile(wb, `data.xlsx`);
-   alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
-   // console.log(BeckmanmethodCode,BeckmanBottleSize,reagentTypeCode,calculateMonthYear(day,BeckmanMonth),BeckmanLot,`0${BeckmanminNumber}`,`0${BeckmanmaxNumber}`)
-}
-    
-    const handleSubmit1 = ()=>{
-       
-        const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
-       // alert(day)
-        setBeckmancode(`${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`)
-        
-        setIsExport1(true)
-    }
-
-
 
     const handleSubmit = async () => {
         const err_arr = []
@@ -381,86 +356,16 @@ const exportToExcel2 = ()=>{
 
         }
     }, [methodCode])
-    useEffect(() => {
-        switch (BeckmanmethodCode) {
-            case "002":
-                setBeckmanMonth(24)
-                break;
-            case "007":
-                setBeckmanMonth(18)
-                break;
-            case "006":
-                setBeckmanMonth(18)
-                break;
-
-            case "009":
-                setBeckmanMonth(18)
-                break;
-            case "034":
-                setBeckmanMonth(18)
-                break;
-            case "098":
-                setBeckmanMonth(24)
-                break;
-            case "032":
-                setBeckmanMonth(24)
-                break;
-            case "004":
-                setBeckmanMonth(18)
-                break;
-            case "079":
-                setBeckmanMonth(12)
-                break;
-            case "155":
-                setBeckmanMonth(18)
-                break;
-            case "047":
-                setBeckmanMonth(12)
-                break;
-            case "011":
-                setBeckmanMonth(18)
-                break;
-            case "020":
-                setBeckmanMonth(18)
-                break;
-            case "021":
-                setBeckmanMonth(12)
-                break;
-            case "087":
-                setBeckmanMonth(18)
-                break;
-            case "026":
-                setBeckmanMonth(18)
-                break;
-            case "083":
-                setBeckmanMonth(18)
-                break;
-            case "012":
-                setBeckmanMonth(18)
-                break;
-            case "016":
-                setBeckmanMonth(18)
-                break;
-            case "118":
-                setBeckmanMonth(18)
-                break;
-            
-            default:
-                setBeckmanMonth(24)
-
-        }
-    }, [BeckmanmethodCode])
-    useEffect(()=>{
-        console.log(BeckmanmethodCode)
-    },[BeckmanmethodCode])
+    
     return (
         <div className="container">
-            <div >
+            <div style={{margin: "10px"}} >
                 <a href='https://www.tec-it.com' title='Barcode Software by TEC-IT' target='_blank'>
 
                 </a>
+                <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>Fruno CA</span>
             </div>
-            <div className={`tab_container`}>
+            <div className={`tab_container`} >
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
                 <div onClick={() => setSelectedTab(2)} className={`tab_container-item ${selectedTab == 2 && "active"}`}>Tạo nhiều mã</div>
                 <div onClick={() => setSelectedTab(3)} className={`tab_container-item ${selectedTab == 3 && "active"}`}>Đọc</div>

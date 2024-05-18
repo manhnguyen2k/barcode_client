@@ -19,10 +19,10 @@ const Beckman = () => {
     const [BeckmanType, setBeckmanType] = useState('1')
     const [BeckmanMonth, setBeckmanMonth] = useState(1)
     const [BeckmanYear, setBeckmanYear] = useState(0)
-    const [BeckmanLot, setBeckmanLot] = useState('0000')
+    const [BeckmanLot, setBeckmanLot] = useState('0001')
     const [BeckmanNumber, setBeckmanNumber] = useState('0001')
-    const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
-    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
+    const [BeckmanminNumber, setBeckmanMinNumber] = useState(1)
+    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState(1)
     const [bottleSizeCode, setBottleSizeCode] = useState(1)
     const [reagentType, setReagentType] = useState(0)
     const [expiryYear, setExpiryYear] = useState(0)
@@ -54,71 +54,24 @@ const Beckman = () => {
     const uid = localStorage.getItem("uid")
     //console.log(token)
 
-    const exportToExcel = async () => {
-        try {
-
-            const dataBarcode = {
-                CompanyCode: companyCode,
-                MethodCode: methodCode,
-                BottleSizeCode: bottleSizeCode,
-                ReagentTyprCode: reagentTypeCode,
-                DayProduce: dayProduce,
-                MonthProduce: monthProduce,
-                YearProduce: yearProduce,
-                ExpiryMonth: expiryMonth,
-                ExpiryDay: expiryDay,
-                ExpiryYear: expiryYear,
-                Expiry_Month: expiry_Month,
-                LotNumber: lotNumber,
-                MinSequenceNumber: minSequenceNumber,
-                MaxSequenceNumber: maxSequenceNumber,
-                SequenceNumber: sequenceNumber,
-            }
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'x-user-id': uid
-                },
-            };
-            try {
-                axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
-                    .then((res) => {
-                        if (res.data.code === 200) {
-                            //setCode(data.data)
-                            console.log(res.data.data)
-                            if (res.data.data !== null || res.data.data.length != 0) {
-                                const data = transformArray(res.data.data);
-                                const ws = XLSX.utils.json_to_sheet(data);
-                                const wb = XLSX.utils.book_new();
-                                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                                XLSX.writeFile(wb, `${res.data.methodecode}_${res.data.bottlesize}_${res.data.reagenttype}_${res.data.dayProduce}_from_${res.data.min}_to_${res.data.max}.xlsx`);
-                                alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
-                            } else {
-                                alert("Có lỗi xảy ra!")
-                            }
-
-
-                        }
-                        else if (res.data.code === 204) {
-                            alert("Ngày tháng năm không hợp lệ!")
-                        }
-                    })
-                    .catch((err) => {
-                        throw err
-                    })
-            } catch (error) {
-                console.error(error)
-            }
-
-
-        } catch (error) {
-            console.error('Lỗi khi ghi file:', error);
-            alert('Đã xảy ra lỗi khi ghi file Excel!');
-        }
-    };
+    
 
 const exportToExcel2 = ()=>{
+    if(BeckmanLot.length!=4){
+        alert("Lot number gồm đủ 4 chữ số!")
+        return
+    }
+    console.log(BeckmanminNumber, BeckmanmaxNumber);
+    if (parseInt(BeckmanminNumber) > 99999 || parseInt(BeckmanmaxNumber) > 99999) {
+      //  console.log(BeckmanminNumber, BeckmanmaxNumber);
+        alert("Số SEQ tối đa gồm 5 chữ số!");
+        return;
+    }
+    if (parseInt(BeckmanminNumber) >  parseInt(BeckmanmaxNumber)) {
+        //  console.log(BeckmanminNumber, BeckmanmaxNumber);
+          alert("Số bắt đầu phải nhỏ hơn số kết thúc");
+          return;
+      }
     const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
     const arr=[]
    for(let i =parseInt(BeckmanminNumber); i<=parseInt(BeckmanmaxNumber); i++){
@@ -136,7 +89,15 @@ const exportToExcel2 = ()=>{
 }
     
     const handleSubmit1 = async()=>{
-        
+        if(BeckmanLot.length!=4){
+            alert("Lot number phải đủ 4 chữ số!")
+            return
+        }
+        if (parseInt(BeckmanNumber) > 99999) {
+            //  console.log(BeckmanminNumber, BeckmanmaxNumber);
+              alert("Số SEQ tối đa gồm 5 chữ số!");
+              return;
+          }
         const config = {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -157,79 +118,7 @@ const exportToExcel2 = ()=>{
 
 
 
-    const handleSubmit = async () => {
-        const err_arr = []
-        if (companyCode == 0) {
-            err_arr.push("Company Code")
-        }
-        if (dayProduce == 0) {
-            err_arr.push("Day Produce")
-        }
-        if (monthProduce == 0) {
-            err_arr.push("Month Produce")
-        }
-        if (yearProduce == 0) {
-            err_arr.push("Year Produce")
-        }
-        if (expiry_Month == 0) {
-            err_arr.push("Expiry Month")
-        }
-        if (minSequenceNumber == 0) {
-            err_arr.push("Min Sequence Number")
-        }
-
-        if (err_arr.length > 0) {
-            const errorMessage = "Nhập đầy đủ thông tin sau: " + err_arr.join(', ');
-            alert(errorMessage);
-            return
-        }
-
-        const dataBarcode = {
-            CompanyCode: companyCode,
-            MethodCode: methodCode,
-            BottleSizeCode: bottleSizeCode,
-            ReagentTyprCode: reagentTypeCode,
-            DayProduce: dayProduce,
-            MonthProduce: monthProduce,
-            YearProduce: yearProduce,
-            ExpiryMonth: expiryMonth,
-            ExpiryDay: expiryDay,
-            ExpiryYear: expiryYear,
-            Expiry_Month: expiry_Month,
-            LotNumber: lotNumber,
-            MinSequenceNumber: minSequenceNumber_once,
-            MaxSequenceNumber: maxSequenceNumber_once,
-            SequenceNumber: sequenceNumber,
-        }
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'x-user-id': uid
-            },
-        };
-        try {
-            const data = await axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
-            // console.log(data.data)
-
-            if (data.data) {
-                if (data.data.code === 200) {
-                    setCode(data.data)
-                    // setDataExel(data.data.data)
-                    if (data.data.data.length > 0) {
-                        setIsExport(true)
-                    }
-
-                }
-                else if (data.data.code === 204) {
-                    alert("Ngày tháng năm không hợp lệ!")
-                }
-            }
-        } catch (error) {
-
-        }
-
-    }
+    
 
     const handleSetToday = () => {
         const currentDate = new Date();
@@ -257,143 +146,15 @@ const exportToExcel2 = ()=>{
 
 
     };
-    const handleMinchange_once = (e) => {
-        const newMin = parseInt(e.target.value);
-        setMinSequenceNumber_once(newMin);
-        setMaxSequenceNumber_once(newMin)
-    }
-    const handleMaxChange = (e) => {
-        const newMax = parseInt(e.target.value);
-        setMaxSequenceNumber(newMax);
-    };
+  
     const transformArray = (inputArray) => {
         return inputArray.map((code, index) => ({
             "Số thứ tự lọ": code.bottleLot,
             "Bar Code": code.code
         }));
     };
-    const handleReload = (id, item) => {
-        console.log(id)
-        const element = document.getElementById(id)
-
-        element.innerHTML = '  <img style="width: 250px; height: 60px;" alt="Barcode Generator TEC-IT -' + item + '" src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> '
-
-        // console.log('  <img alt="Barcode Generator TEC-IT -' + item + ' src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> ')
-        // console.log(`https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`)
-        //  element.src = `https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`
-    }
-    useEffect(() => {
-        // Gọi hàm handleSetToday khi component được mount
-        handleSetToday();
-    }, []); // Dấu ngoặc vuông rỗng đảm bảo useEffect chỉ chạy một lần sau khi component được mount
-
-    const handleRead = async () => {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'x-user-id': uid
-            },
-        };
-        if (barcode.length != 18) {
-            alert("Mã vạch phải đủ 18 kí tự!")
-            return
-        }
-        try {
-            const data = await axios.get(`https://barcodeserver-latest-b6nu.onrender.com/barcode/read?code=${barcode}`, config)
-            // console.log(data)
-            if (data.data) {
-                // console.log(data.data.methodcode)
-                setBarcodeInfo({
-                    companycode: data.data.companycode,
-                    methodcode: data.data.methodecode,
-                    bottlesize: data.data.bottlesize,
-                    reagenttype: data.data.reagenttype,
-                    lotnumber: data.data.lotnumber,
-                    bottlesequence: data.data.bottlesequence,
-                    date: data.data.date
-                })
-            }
-            // console.log(barcodeInfo.methodcode)
-        } catch (error) {
-            console.error(error)
-        }
-
-    }
-    useEffect(() => {
-        switch (methodCode) {
-            case "1":
-                setExpiry_Month(24)
-                break;
-            case "20":
-                setExpiry_Month(18)
-                break;
-            case "5":
-                setExpiry_Month(18)
-                break;
-
-            case "19":
-                setExpiry_Month(18)
-                break;
-            case "62":
-                setExpiry_Month(18)
-                break;
-            case "63":
-                setExpiry_Month(18)
-                break;
-            case "10":
-                setExpiry_Month(18)
-                break;
-            case "13":
-                setExpiry_Month(18)
-                break;
-            case "35":
-                setExpiry_Month(18)
-                break;
-            case "36":
-                setExpiry_Month(12)
-                break;
-            case "16":
-                setExpiry_Month(18)
-                break;
-            case "11":
-                setExpiry_Month(18)
-                break;
-            case "12":
-                setExpiry_Month(18)
-                break;
-            case "30":
-                setExpiry_Month(18)
-                break;
-            case "29":
-                setExpiry_Month(24)
-                break;
-            case "32":
-                setExpiry_Month(24)
-                break;
-            case "31":
-                setExpiry_Month(18)
-                break;
-            case "37":
-                setExpiry_Month(24)
-                break;
-            case "2":
-                setExpiry_Month(18)
-                break;
-            case "14":
-                setExpiry_Month(12)
-                break;
-            case "18":
-                setExpiry_Month(12)
-                break;
-            case "25":
-                setExpiry_Month(18)
-                break;
-            default:
-                setExpiry_Month(24)
-
-        }
-    }, [methodCode])
+  
+   
     useEffect(() => {
         switch (BeckmanmethodCode) {
             case "002":
@@ -466,15 +227,12 @@ const exportToExcel2 = ()=>{
 
         }
     }, [BeckmanmethodCode])
-    useEffect(()=>{
-        console.log(BeckmanmethodCode)
-    },[BeckmanmethodCode])
+  
     return (
         <div className="container">
-            <div >
-                <a href='https://www.tec-it.com' title='Barcode Software by TEC-IT' target='_blank'>
-
-                </a>
+            <div style={{margin: "10px"}}>
+            <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>Beckman coulter AU</span>
+                
             </div>
             <div className={`tab_container`}>
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
