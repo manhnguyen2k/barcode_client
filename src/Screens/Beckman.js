@@ -89,6 +89,10 @@ const exportToExcel2 = ()=>{
 }
     
     const handleSubmit1 = async()=>{
+        if(parseInt(dayProduce)>31 || parseInt(dayProduce)<1 || parseInt(monthProduce)>12||parseInt(monthProduce)<1 || parseInt(yearProduce)<2010 || parseInt(yearProduce)>2150){
+            alert("Thời gian không hợp lệ!")
+            return
+        }
         if(BeckmanLot.length!=4){
             alert("Lot number phải đủ 4 chữ số!")
             return
@@ -228,6 +232,9 @@ const exportToExcel2 = ()=>{
         }
     }, [BeckmanmethodCode])
   
+    useEffect(()=>{
+        handleSetToday()
+    },[])
     return (
         <div className="container">
             <div style={{margin: "10px"}}>
@@ -321,15 +328,15 @@ const exportToExcel2 = ()=>{
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Ngày sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" min={1} max={31} value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span>Tháng sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
+                                <span>Tháng sản xuất</span> 
+                                <input style={{ width: "100px" }} type="number" min={1} max={12} value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Năm sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" min={2000}  value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
                             </div>
                             <button onClick={handleSetToday} style={{ "width": "70px", }}>Hôm nay</button>
                         </div>
@@ -472,15 +479,15 @@ const exportToExcel2 = ()=>{
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Ngày sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" min={1} max={31} value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Tháng sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" min={1} max={12} value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Năm sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" min={2000} value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
                             </div>
                             <button onClick={handleSetToday} style={{ "width": "70px", }}>Hôm nay</button>
                         </div>
@@ -560,12 +567,13 @@ function calculateMonthYear(startDate, months) {
        const newDay = date.getDate();
        const newMonth = date.getMonth() + 1; // Tháng trong JavaScript bắt đầu từ 0, nên cần cộng thêm 1
        const newYear = date.getFullYear();
-   
+       console.log(newYear)
        // Định dạng tháng để có hai chữ số
        const formattedMonth = newMonth < 10 ? '0' + newMonth : newMonth;
    
        // Định dạng ngày để có hai chữ số
        const formattedYear = newYear.toString().slice(-2);
+       console.log(formattedYear)
        // Trả về chuỗi dạng "DD/MM/YYYY"
        return `${formattedMonth}${formattedYear}`;
    
