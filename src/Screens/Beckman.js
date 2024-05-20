@@ -21,8 +21,8 @@ const Beckman = () => {
     const [BeckmanYear, setBeckmanYear] = useState(0)
     const [BeckmanLot, setBeckmanLot] = useState('0001')
     const [BeckmanNumber, setBeckmanNumber] = useState('0001')
-    const [BeckmanminNumber, setBeckmanMinNumber] = useState(1)
-    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState(1)
+    const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
+    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
     const [bottleSizeCode, setBottleSizeCode] = useState(1)
     const [reagentType, setReagentType] = useState(0)
     const [expiryYear, setExpiryYear] = useState(0)
@@ -62,7 +62,7 @@ const exportToExcel2 = ()=>{
         return
     }
     console.log(BeckmanminNumber, BeckmanmaxNumber);
-    if (parseInt(BeckmanminNumber) > 99999 || parseInt(BeckmanmaxNumber) > 99999) {
+    if (BeckmanminNumber.length > 5 || BeckmanmaxNumber.length > 5) {
       //  console.log(BeckmanminNumber, BeckmanmaxNumber);
         alert("Số SEQ tối đa gồm 5 chữ số!");
         return;
@@ -73,18 +73,38 @@ const exportToExcel2 = ()=>{
           return;
       }
     const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
-    const arr=[]
-   for(let i =parseInt(BeckmanminNumber); i<=parseInt(BeckmanmaxNumber); i++){
-    const uncheck = `${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(i)}`
-    const checkedcode = `${uncheck}${GET_CHECK_BIT_Beckman(uncheck)}`
-    arr.push({bottleLot: i, code:checkedcode})
-   }
-   const data = transformArray(arr);
+   
+    const uncheck = `${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}`
+    const minSEQ = parseInt(convertToFiveDigitString(BeckmanminNumber))
+    const maxSEQ = parseInt(convertToFiveDigitString(BeckmanmaxNumber))
+    const config = {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'x-user-id': uid
+        },
+    };
+    const dataUncheck = {
+        uncheckcode: uncheck,
+        minSEQ: minSEQ,
+        maxSEQ: maxSEQ
+    }
+    axios.post('https://barcodeserver-latest-b6nu.onrender.com/barcode/beckman_genator', dataUncheck, config)
+    .then((res)=>{
+        //console.log(res)
+    
+    
+        const data = transformArray(res.data.checkedcodes);
    const ws = XLSX.utils.json_to_sheet(data);
    const wb = XLSX.utils.book_new();
    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
    XLSX.writeFile(wb, `Beckman.xlsx`);
    alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
+    })
+    .catch((err)=>{
+        console.error(err)
+    })
+   
    // console.log(BeckmanmethodCode,BeckmanBottleSize,reagentTypeCode,calculateMonthYear(day,BeckmanMonth),BeckmanLot,`0${BeckmanminNumber}`,`0${BeckmanmaxNumber}`)
 }
     
@@ -97,11 +117,11 @@ const exportToExcel2 = ()=>{
             alert("Lot number phải đủ 4 chữ số!")
             return
         }
-        if (parseInt(BeckmanNumber) > 99999) {
-            //  console.log(BeckmanminNumber, BeckmanmaxNumber);
-              alert("Số SEQ tối đa gồm 5 chữ số!");
-              return;
-          }
+      if(!validateString(BeckmanNumber)){
+        alert("SEQ không hợp lệ")
+        return
+      }
+      console.log()
         const config = {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -112,12 +132,25 @@ const exportToExcel2 = ()=>{
         const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
        // alert(day)
       
-       const uncheckcode = `${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}${padToFiveDigits(BeckmanNumber)}`
+       const uncheckcode = `${BeckmanmethodCode}${BeckmanBottleSize}${reagentTypeCode}${calculateMonthYear(day,BeckmanMonth)}${BeckmanLot}`
      //  console.log(uncheckcode)
-    
-       setBeckmancode(`${uncheckcode}${GET_CHECK_BIT_Beckman(uncheckcode)}`)
-        
-        setIsExport1(true)
+        const minSEQ = parseInt(convertToFiveDigitString(BeckmanNumber))
+        const maxSEQ = parseInt(convertToFiveDigitString(BeckmanNumber))
+        const data = {
+            uncheckcode: uncheckcode,
+            minSEQ: minSEQ,
+            maxSEQ: maxSEQ
+        }
+        axios.post('https://barcodeserver-latest-b6nu.onrender.com/barcode/beckman_genator', data, config)
+        .then((res)=>{
+           // console.log(res)
+            setBeckmancode(res.data.checkedcodes[0].code)
+            setIsExport1(true)
+        })
+        .catch((err)=>{
+            console.error(err)
+        })
+
     }
 
 
@@ -357,8 +390,9 @@ const exportToExcel2 = ()=>{
                        
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số SEQ:
                         </span>
-                        <input type="number" required min={0} value={BeckmanNumber} onChange={(e)=>setBeckmanNumber(e.target.value)}></input>
-                      
+                        <input type="text" required min={0} value={BeckmanNumber} onChange={(e)=>setBeckmanNumber(e.target.value)}></input>
+                        <span >Mã: {convertToFiveDigitString(BeckmanNumber)} </span>
+                        
                         {/**
                          *  <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -511,11 +545,13 @@ const exportToExcel2 = ()=>{
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Bắt đầu từ</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={BeckmanminNumber} onChange={(e)=>setBeckmanMinNumber(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="text" min={0} value={BeckmanminNumber} onChange={(e)=>setBeckmanMinNumber(e.target.value)}></input>
+                                <span >Mã: {convertToFiveDigitString(BeckmanminNumber)} </span>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Kết thúc</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={BeckmanmaxNumber} onChange={(e)=>setBeckmanMaxNumber(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="text" min={0} value={BeckmanmaxNumber} onChange={(e)=>setBeckmanMaxNumber(e.target.value)}></input>
+                                <span >Mã: {convertToFiveDigitString(BeckmanmaxNumber)} </span>
                             </div>
                         </div>
 
@@ -549,6 +585,78 @@ const exportToExcel2 = ()=>{
     )
 }
 
+function convertToFiveDigitString(inputString) {
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+    const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const allLetters = alphabet + ALPHABET;
+    let result = '';
+
+    // Kiểm tra nếu chuỗi có chữ cái đầu tiên
+    if (allLetters.includes(inputString[0])) {
+        // Lấy chữ cái đầu tiên và chuyển nó thành số
+        let letter = inputString[0];
+        let letterNumber = alphabet.indexOf(letter.toLowerCase()) + 10;
+        let numberPart = inputString.slice(1);
+
+        // Xử lý các trường hợp số phía sau chữ cái
+        if (numberPart === '') {
+            result = `${letterNumber}000`;
+        } else if (numberPart.length <= 3) {
+            result = `${letterNumber}${numberPart.padStart(3, '0')}`;
+        }
+    } else {
+        // Không có chữ cái đầu tiên, chỉ có số
+        let numberPart = inputString;
+        let letterNumber = 0;
+
+        if (numberPart.length <= 3) {
+            letterNumber = 0;
+        } else if (numberPart.length === 4) {
+            letterNumber = numberPart[0];
+            numberPart = numberPart.slice(1);
+        } else if (numberPart.length === 5) {
+            letterNumber = parseInt(numberPart.slice(0, 2));
+            numberPart = numberPart.slice(2);
+
+            // Kiểm tra nếu số quá lớn
+            if (letterNumber > 32) {
+                return -1;
+            }
+        }
+
+        result = `${letterNumber.toString().padStart(2, '0')}${numberPart.padStart(3, '0')}`;
+    }
+
+    return result.padStart(5, '0');
+}
+
+function validateString(inputString) {
+    if(inputString.length>5){
+        return false;
+    }
+    // Kiểm tra xem chuỗi có chứa ký tự không hợp lệ hay không
+    if (!/^[0-9A-Za-z]*$/.test(inputString)) {
+        return false;
+    }
+
+    // Tìm tất cả các chữ cái trong chuỗi
+    const letters = inputString.match(/[A-Za-z]/g);
+
+    // Kiểm tra số lượng chữ cái
+    if (letters && letters.length > 1) {
+        return false;
+    }
+
+    // Kiểm tra nếu tồn tại duy nhất một chữ cái, nó phải đứng ở đầu
+    if (letters && letters.length === 1) {
+        if (inputString[0] !== letters[0]) {
+            return false;
+        }
+    }
+
+    // Nếu chuỗi hợp lệ
+    return true;
+}
 
 function calculateMonthYear(startDate, months) {
     // Chuyển đổi ngày bắt đầu thành đối tượng Date
