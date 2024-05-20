@@ -587,8 +587,8 @@ const exportToExcel2 = ()=>{
 }
 
 function convertToFiveDigitString(inputString) {
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz';
-    const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = 'abcdefghiklmnopqrstvxyz';
+    const ALPHABET = 'ABCDEFGHIKLMNOPQRSTVXYZ';
     const allLetters = alphabet + ALPHABET;
     let result = '';
 
@@ -632,8 +632,8 @@ function convertToFiveDigitString(inputString) {
 }
 function reverseConvert(fiveDigitString) {
     const letterMappings = [
-        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'v', 'x', 'y', 'z'
     ];
 
     let letterIndex = parseInt(fiveDigitString.slice(0, 2));
@@ -705,17 +705,7 @@ function calculateMonthYear(startDate, months) {
    
 }
 
-function padToFiveDigits(number) {
-    // Chuyển đổi số thành chuỗi
-    let numberStr = number.toString();
 
-    // Kiểm tra độ dài của chuỗi và thêm số 0 vào đầu chuỗi cho đến khi độ dài đạt 5
-    while (numberStr.length < 5) {
-        numberStr = '0' + numberStr;
-    }
-
-    return numberStr;
-}
 function formatNumber(num) {
     const paNum = parseInt(num)
     if (paNum >= 1 && paNum <= 9) {
@@ -725,41 +715,6 @@ function formatNumber(num) {
     }
 }
 
-function getMethodNameByCode(code) {
-    const methodOptions = [
-        { value: 1, label: 'ALB (Albumin)' },
-        { value: 20, label: 'ALTGPT (ALT)' },
-        { value: 5, label: 'AMY_IF (Amylase)' },
-        { value: 19, label: 'ASTGOT (AST)' },
-        { value: 48, label: 'BIL-Dv' },
-        { value: 49, label: 'BIL-Tv' },
-        { value: 10, label: 'TC-CHO (Total Cholesterol)' },
-        { value: 13, label: 'CK-MB' },
-        { value: 15, label: 'CRE_Ja' },
-        { value: 36, label: 'CRP' },
-        { value: 8, label: 'Ca_A3' },
-        { value: 16, label: 'GGT' },
-        { value: 17, label: 'GNU_HK' },
-        { value: 11, label: 'HDL-C (HDL-Cholesterol)' },
-        { value: 12, label: 'LDN-C (LDL-Cholesterol)' },
-        { value: 30, label: 'TG (Total Triglycerides)' },
-        { value: 29, label: 'TP (Total Protein)' },
-        { value: 32, label: 'UA (Uric Acid)' },
-        { value: 31, label: 'UREA (Urea)' },
-        { value: 37, label: 'HbA1c' },
-        { value: 2, label: 'ALP' },
-        { value: 14, label: 'CK' },
-        { value: 35, label: 'CRE (Creatinine)' },
-        { value: 6, label: 'BIL-D (Bilirubin Direct)' },
-        { value: 18, label: 'GLU (Glucose)' },
-        { value: 25, label: 'LDH (Lactate Dehydrogenase)' },
-        { value: 7, label: 'BIL-T (Bilirubin Total)' },
-    ];
-
-    const selectedMethod = methodOptions.find(method => method.value.toString() === code.toString());
-    //  console.log(selectedMethod)
-    return selectedMethod ? selectedMethod.label : null;
-}
 
 const beckmanMethodMap = {
     '002': 'ALB',
