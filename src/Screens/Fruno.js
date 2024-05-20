@@ -6,7 +6,7 @@ import copy from 'clipboard-copy';
 import * as XLSX from 'xlsx';
 import { LazyLoadImage, LazyLoadComponent } from 'react-lazy-load-image-component';
 import CachedIcon from '@mui/icons-material/Cached';
-import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import Barcode from 'react-jsbarcode';
 const Fruno = () => {
     const [companyCode, setCompanyCode] = useState(1)
@@ -917,4 +917,14 @@ function getMethodNameByValue(value) {
 
     return selectedMethod ? selectedMethod.label : null;
 }
-export default Fruno
+const FrunoPage = ()=>{
+    const navigate = useNavigate()
+    return (
+        <>
+         <button onClick={()=>{navigate('/beckman')}}>Đổi máy</button>
+            <Fruno/>
+           
+        </>
+    )
+}
+export default FrunoPage

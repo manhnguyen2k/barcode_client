@@ -6,8 +6,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import Barcode1 from './barcode';
 import Err from './dangnhap.err';
 import Homepage from './Pages/Home';
-import Fruno from './Screens/Fruno';
-import Beckman from './Screens/Beckman';
+import FrunoPage from './Screens/Fruno';
+import BeckmanPage from './Screens/Beckman';
 const AppRouter = () => {
     const isLogin = useSelector(state => state.auth.isLogin);
    
@@ -16,8 +16,8 @@ const AppRouter = () => {
     <Routes>
     <Route exact path="/" element={ <Login />} />
     <Route exact path="/home" element={ <Homepage />} />
-    <Route exact path="/fruno" element={ <Fruno />} />
-    <Route exact path="/beckman" element={ <Beckman />} />
+    <Route exact path="/fruno" element={ <FrunoPage />} />
+    <Route exact path="/beckman" element={ <BeckmanPage />} />
     <Route path="/barcode" element={isLogin  ? <Barcode1 /> : <Navigate to="/" />} />
   </Routes>
   
