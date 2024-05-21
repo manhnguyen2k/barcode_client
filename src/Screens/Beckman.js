@@ -9,6 +9,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import { useSelector, useDispatch } from 'react-redux';
 import Barcode from 'react-jsbarcode';
 import { useNavigate } from 'react-router-dom';
+import { colors } from "@mui/material";
 const Beckman = () => {
     const [companyCode, setCompanyCode] = useState(1)
     const [BeckmanCode,setBeckmancode] = useState()
@@ -24,14 +25,6 @@ const Beckman = () => {
     const [BeckmanNumber, setBeckmanNumber] = useState('0001')
     const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
     const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
-    const [bottleSizeCode, setBottleSizeCode] = useState(1)
-    const [reagentType, setReagentType] = useState(0)
-    const [expiryYear, setExpiryYear] = useState(0)
-    const [expiryMonth, setExpiryMonth] = useState(0)
-    const [expiryDay, setExpiryDay] = useState(0)
-    const [expiry_Month, setExpiry_Month] = useState(1)
-    const [lotNumber, setLotNumber] = useState(1)
-    const [sequenceNumber, setSequenceNumber] = useState(0)
     const [reagentTypeCode, setReagentTypeCode] = useState(1)
     const [dayProduce, setDayProduce] = useState("")
     const [monthProduce, setMonthProduce] = useState("")
@@ -46,7 +39,8 @@ const Beckman = () => {
     const [isCopy, setIsCopy] = useState(false);
     const [isExport, setIsExport] = useState(false);
     const [isExport1, setIsExport1] = useState(false);
-    const [reloadClicked, setReloadClicked] = useState(false);
+    const [error, setError] = useState(false);
+    const [error1, setError1] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [changeImage, setChangeImage] = useState("1");
     const [barcode, setBarcode] = useState("00203105260001000013")
@@ -316,6 +310,20 @@ const exportToExcel2 = ()=>{
         }
 
     }
+    useEffect(()=>{
+        if(parseInt(BeckmanNumber)>32999){
+            setError(true)
+        }else{
+            setError(false)
+        }
+    },[BeckmanNumber])
+    useEffect(()=>{
+        if(parseInt(BeckmanmaxNumber)>32999||parseInt(BeckmanminNumber)>32999){
+            setError1(true)
+        }else{
+            setError1(false)
+        }
+    },[BeckmanmaxNumber,BeckmanminNumber])
     return (
         <div className="container">
             <div style={{margin: "10px"}}>
@@ -439,8 +447,8 @@ const exportToExcel2 = ()=>{
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số SEQ:
                         </span>
                         <input type="text" required min={0} value={BeckmanNumber} onChange={(e)=>setBeckmanNumber(e.target.value)}></input>
-                        <span >SEQ: {convertToFiveDigitString(BeckmanNumber)}-{reverseConvert(convertToFiveDigitString(BeckmanNumber))} </span>
-                        
+                        {!error&& <span >SEQ: {convertToFiveDigitString(BeckmanNumber)}-{reverseConvert(convertToFiveDigitString(BeckmanNumber))} </span>}
+                        {error&& <span style={{color:"red"}}> Bạn đang nhập số SEQ lớn hơn 32999!</span>}
                         {/**
                          *  <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -659,15 +667,16 @@ const exportToExcel2 = ()=>{
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Bắt đầu từ</span>
                                 <input style={{ width: "100px" }} type="text" min={0} value={BeckmanminNumber} onChange={(e)=>setBeckmanMinNumber(e.target.value)}></input>
-                                <span >SEQ: {convertToFiveDigitString(BeckmanminNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanminNumber))} </span>
+                               {!error1&& <span >SEQ: {convertToFiveDigitString(BeckmanminNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanminNumber))} </span>} 
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Kết thúc</span>
                                 <input style={{ width: "100px" }} type="text" min={0} value={BeckmanmaxNumber} onChange={(e)=>setBeckmanMaxNumber(e.target.value)}></input>
-                                <span >SEQ: {convertToFiveDigitString(BeckmanmaxNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanmaxNumber))} </span>
+                                {!error1&& <span >SEQ: {convertToFiveDigitString(BeckmanmaxNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanmaxNumber))} </span>}
                             </div>
+                         
                         </div>
-
+                        {error1&& <span style={{color:"red"}}> Bạn đang nhập số SEQ lớn hơn 32999!</span>}
                      
                         {/**<input type="number" min={0} value={minSequenceNumber} onChange={handleMinchange_once}></input> */}
                         {/**
@@ -751,7 +760,8 @@ function convertToFiveDigitString(inputString) {
 
             // Kiểm tra nếu số quá lớn
             if (letterNumber > 32) {
-                return -1;
+
+                letterNumber = 32;
             }
         }
 
@@ -761,6 +771,7 @@ function convertToFiveDigitString(inputString) {
     return result.padStart(5, '0');
 }
 function reverseConvert(fiveDigitString) {
+   // console.log(fiveDigitString)
     const letterMappings = [
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
         'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'v', 'x', 'y', 'z'
