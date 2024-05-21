@@ -271,7 +271,7 @@ const exportToExcel2 = ()=>{
         // console.log(id)
          const element = document.getElementById(id)
  
-         element.innerHTML = '  <img style="width: 250px; height: 60px;" alt="Barcode Generator TEC-IT -' + item + '" src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=GS1-128&translate-esc=on" style= "maxWidth: 250px" /> '
+         element.innerHTML = '  <img style="width: 250px; height: 60px;" alt="Barcode Generator TEC-IT -' + item + '" src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> '
  
          // console.log('  <img alt="Barcode Generator TEC-IT -' + item + ' src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> ')
          // console.log(`https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`)
@@ -487,7 +487,7 @@ const exportToExcel2 = ()=>{
                                                 <div id={`img_code_beckman`}>
                                                     <img
                                                         alt={`Barcode Generator TEC-IT - ${BeckmanCode}`}
-                                                        src={`https://barcode.tec-it.com/barcode.ashx?data=${BeckmanCode}&code=GS1-128&translate-esc=on`}
+                                                        src={`https://barcode.tec-it.com/barcode.ashx?data=${BeckmanCode}&code=Code25IL`}
                                                         style={{ "maxWidth": "250px", height: "60px" }}
 
                                                     />
@@ -500,7 +500,7 @@ const exportToExcel2 = ()=>{
                                             </div>
                                         ) : (
                                             <div className="jsbarcode" >
-                                                <Barcode value={BeckmanCode} options={{ height: "80px", width: "3px" }} renderer="image" />
+                                                <Barcode value={BeckmanCode} options={{format: 'itf', height: "80px", width: "3px" }} renderer="image" />
 
                                             </div>
 
@@ -697,14 +697,14 @@ const exportToExcel2 = ()=>{
                         <input type="text" value={barcode} onChange={(e) => setBarcode(e.target.value)}></input>
                     </div>
                     <button onClick={() => handleRead()} style={{ "width": "70px", }}>Đọc</button>
-                    {barcodeInfo != null &&
+                    {barcodeInfo.SEQ  &&
                         <ul className="barcode_render_detail" style={{ marginBottom: "0", fontSize: "14px" }}>
                             <li><span>Mã hóa chất: </span>{barcodeInfo.chemicalCode}</li>
                             <li><span>Kích thước lọ:</span> {barcodeInfo.bottleSize}</li>
                             <li><span>Loại mã:</span> {barcodeInfo.typeCode}</li>
-                            <li><span>Tháng hết hạn:</span> {barcodeInfo.month}-{barcodeInfo.year} </li>
+                            <li><span>Tháng hết hạn:</span> { `${barcodeInfo.month} - 20${barcodeInfo.year}`} </li>
                             <li><span>Số Lot:</span> {barcodeInfo.lotNumber} </li>
-                            <li><span>Số SEQ:</span> {barcodeInfo.SEQ}</li>
+                            <li><span>Số SEQ:</span>  {`${convertSEQ(barcodeInfo.SEQ)} - ${barcodeInfo.SEQ}`}</li>
                         </ul>}
 
                 </div>
@@ -777,6 +777,34 @@ function reverseConvert(fiveDigitString) {
     
   
 }
+function convertSEQ(seq) {
+   if(!seq){
+    return 
+   }
+    const seqCharMap = {
+        "0": "0", "1": "1", "2": "2", "3": "3", "4": "4",
+        "5": "5", "6": "6", "7": "7", "8": "8", "9": "9",
+        "A": "10", "B": "11", "C": "12", "D": "13", "E": "14",
+        "F": "15", "G": "16", "H": "17", "I": "18", "K": "19",
+        "L": "20", "M": "21", "N": "22", "O": "23", "P": "24",
+        "Q": "25", "R": "26", "S": "27", "T": "28", "V": "29",
+        "X": "30", "Y": "31", "Z": "32"
+    };
+
+    if (seq.length === 5 && /^\d+$/.test(seq)) {
+        // If the input is already 5 digits
+        return seq;
+    } else if (seq.length === 4 && /^[A-Z]\d{3}$/.test(seq)) {
+        // If the input is in the format 1 letter followed by 3 digits
+        const firstChar = seq.charAt(0);
+        const mappedNumber = seqCharMap[firstChar];
+        const remainingDigits = seq.slice(1);
+        return mappedNumber + remainingDigits;
+    } else {
+        throw new Error("Invalid SEQ format");
+    }
+}
+
 
 function validateString(inputString) {
     if(inputString.length>5){
