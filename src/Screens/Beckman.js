@@ -49,7 +49,7 @@ const Beckman = () => {
     const [reloadClicked, setReloadClicked] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [changeImage, setChangeImage] = useState("1");
-    const [barcode, setBarcode] = useState("001011141000100018")
+    const [barcode, setBarcode] = useState("00203105260001000013")
     const [barcodeInfo, setBarcodeInfo] = useState({})
     const token = localStorage.getItem("token")
     const uid = localStorage.getItem("uid")
@@ -122,7 +122,7 @@ const exportToExcel2 = ()=>{
         alert("SEQ không hợp lệ")
         return
       }
-      console.log()
+      //console.log()
         const config = {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -266,9 +266,56 @@ const exportToExcel2 = ()=>{
         }
     }, [BeckmanmethodCode])
   
+
+    const handleReload = (id, item) => {
+        // console.log(id)
+         const element = document.getElementById(id)
+ 
+         element.innerHTML = '  <img style="width: 250px; height: 60px;" alt="Barcode Generator TEC-IT -' + item + '" src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=GS1-128&translate-esc=on" style= "maxWidth: 250px" /> '
+ 
+         // console.log('  <img alt="Barcode Generator TEC-IT -' + item + ' src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> ')
+         // console.log(`https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`)
+         //  element.src = `https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`
+     }
+
     useEffect(()=>{
         handleSetToday()
     },[])
+
+
+    const handleRead = async () => {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'x-user-id': uid
+            },
+        };
+        if (barcode.length != 20) {
+            alert("Mã vạch phải đủ 18 kí tự!")
+            return
+        }
+        try {
+            const data = await axios.get(`https://barcodeserver-latest-b6nu.onrender.com/barcode/read_beckman?code=${barcode}`, config)
+            // console.log(data)
+            if (data.status===200 && data.data.info_code.length!=0) {
+                // console.log(data.data.methodcode)
+                setBarcodeInfo({
+                    chemicalCode  : data.data.info_code.chemicalCode,
+                    bottleSize: data.data.info_code.bottleSize,
+                    typeCode: data.data.info_code.typeCode,
+                    month: data.data.info_code.month,
+                    year: data.data.info_code.year,
+                    lotNumber: data.data.info_code.lotNumber,
+                    SEQ: data.data.info_code.SEQ
+                })
+            }
+            // console.log(barcodeInfo.methodcode)
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
     return (
         <div className="container">
             <div style={{margin: "10px"}}>
@@ -278,7 +325,7 @@ const exportToExcel2 = ()=>{
             <div className={`tab_container`}>
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
                 <div onClick={() => setSelectedTab(2)} className={`tab_container-item ${selectedTab == 2 && "active"}`}>Tạo nhiều mã</div>
-              
+                <div onClick={() => setSelectedTab(3)} className={`tab_container-item ${selectedTab == 3 && "active"}`}>Đọc</div>
             </div>
             {selectedTab == 1 &&
                 <div className="container_barcode">
@@ -412,21 +459,86 @@ const exportToExcel2 = ()=>{
                        
                        
                          <button style={{ marginBottom: "10px" }} onClick={handleSubmit1}>Tạo mã Benckman</button>
-                       
-
+                        
                         {/** 
                         * {isExport && <button onClick={exportToExcel}>Xuất File Exels</button>}
                        */}
 
 
                     </div>
-                    {isExport1 && 
-                        <div className="barcode_item" >
-                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Mã code: {BeckmanCode}</span>
-                            <span class="tooltip1" data-tooltip="Copy Number Code " data-tooltip-pos="up" data-tooltip-length="medium"> <ContentPasteIcon onClick={() => handleCopy(BeckmanCode)} style={{ cursor: "pointer" }} /></span>
+                    
+                        <div className="barcode_item barcode_render_contain" style={{ "margin": "auto" }} >
+                        {isExport1 &&
+                            <select style={{ width: "100px", marginBottom: "10px" }} value={changeImage} onChange={(e) => setChangeImage(e.target.value)}>
+                                <option value={1}>Js Barcode </option>
+                                <option value={2}>Tec-it</option>
+                            </select>}
 
-                        </div>}
-                  
+                        {isExport1 &&
+                            <div  className="barcode_render">
+                                <div className="barcode_render_img" >
+                                    <LazyLoadComponent delayTime={200}>
+
+                                        {/**
+                     * 
+                     */}
+                                        {changeImage == "2" ? (
+                                            <div style={{ width: '250px', height: "60px" }} >
+                                                <div id={`img_code_beckman`}>
+                                                    <img
+                                                        alt={`Barcode Generator TEC-IT - ${BeckmanCode}`}
+                                                        src={`https://barcode.tec-it.com/barcode.ashx?data=${BeckmanCode}&code=GS1-128&translate-esc=on`}
+                                                        style={{ "maxWidth": "250px", height: "60px" }}
+
+                                                    />
+                                                </div>
+
+
+                                                <p style={{ margin: "0 0 0 0" }}>
+                                                    <span class="tooltip1" data-tooltip="Reload Codebar Image" data-tooltip-pos="up" data-tooltip-length="medium"> <CachedIcon style={{ cursor: "pointer" }} onClick={() => handleReload(`img_code_beckman`, BeckmanCode)} /></span>
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <div className="jsbarcode" >
+                                                <Barcode value={BeckmanCode} options={{ height: "80px", width: "3px" }} renderer="image" />
+
+                                            </div>
+
+                                        )
+                                        }
+
+
+
+
+                                    </LazyLoadComponent>
+                                    <div style={{ display: "flex", flexDirection: "row", marginTop: "10px" }}>
+                                        <p>{BeckmanCode}</p>
+
+                                        <p>
+                                            <span class="tooltip1" data-tooltip="Copy Number Code " data-tooltip-pos="up" data-tooltip-length="medium"> <ContentPasteIcon onClick={() => handleCopy(BeckmanCode)} style={{ cursor: "pointer" }} /></span>
+
+                                        </p>
+                                    </div>
+
+                                </div>
+                                {/*
+                                    <div>
+                                    <ul className="barcode_render_detail" style={{ marginBottom: "0", fontSize: "14px" }}>
+                                        <li><span>Company Code: </span>{extractSubstring(item, 0, 2)}</li>
+                                        <li><span>Method:</span> {getMethodNameByCode(extractSubstring(item, 3, 4))}</li>
+                                        <li><span>Bottle Size:</span> {getBottleSizeNameByCode(extractSubstring(item, 5, 5))}</li>
+                                        <li><span>Reagent Type:</span> {getReagentTypeNameByCode(extractSubstring(item, 6, 6))}</li>
+                                        <li><span>Day Expiry(d/m/y):</span> {convertDateStringToCustomFormat(code?.date)}</li>
+                                        <li><span>Lot Number:</span> {extractSubstring(item, 10, 12)} </li>
+                                        <li><span>Bottle Sequence Number:</span> {extractSubstring(item, 13, 16)}</li>
+                                    </ul>
+                                </div>
+                                */}
+
+                            </div>
+            }
+                        
+                    </div>
                        
 
                   
@@ -578,7 +690,25 @@ const exportToExcel2 = ()=>{
 
                 </div>
             }
-          
+           {selectedTab == 3 &&
+                <div className="container_barcode">
+                    <div className="barcode_item">
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Nhập số mã vạch để trích xuất thông tin</span>
+                        <input type="text" value={barcode} onChange={(e) => setBarcode(e.target.value)}></input>
+                    </div>
+                    <button onClick={() => handleRead()} style={{ "width": "70px", }}>Đọc</button>
+                    {barcodeInfo != null &&
+                        <ul className="barcode_render_detail" style={{ marginBottom: "0", fontSize: "14px" }}>
+                            <li><span>Mã hóa chất: </span>{barcodeInfo.chemicalCode}</li>
+                            <li><span>Kích thước lọ:</span> {barcodeInfo.bottleSize}</li>
+                            <li><span>Loại mã:</span> {barcodeInfo.typeCode}</li>
+                            <li><span>Tháng hết hạn:</span> {barcodeInfo.month}-{barcodeInfo.year} </li>
+                            <li><span>Số Lot:</span> {barcodeInfo.lotNumber} </li>
+                            <li><span>Số SEQ:</span> {barcodeInfo.SEQ}</li>
+                        </ul>}
+
+                </div>
+            }
            
 
 
