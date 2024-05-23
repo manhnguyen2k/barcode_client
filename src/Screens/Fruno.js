@@ -1,30 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "../barcode.css"
-import axios from "axios";
 import ContentPasteIcon from '@mui/icons-material/ContentPaste';
 import copy from 'clipboard-copy';
 import * as XLSX from 'xlsx';
-import { LazyLoadImage, LazyLoadComponent } from 'react-lazy-load-image-component';
+import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import CachedIcon from '@mui/icons-material/Cached';
 import { useNavigate } from "react-router-dom";
 import Barcode from 'react-jsbarcode';
+import { FrunoGenator, FrunoRead } from "../api/fruno.api";
+import { ClipLoader } from 'react-spinners';
+import "../Pages/styles.css"
 const Fruno = () => {
     const [companyCode, setCompanyCode] = useState(1)
-    const [BeckmanCode,setBeckmancode] = useState()
     const [methodCode, setMethodCode] = useState(1)
     const [machineCode, setMechineCode] = useState(1)
-    const [BeckmanmethodCode, setBeckmanMethodCode] = useState('002')
-    const [BeckmanBottleSize, setBeckmanBottleSize] = useState('03')
-    const [BeckmanLotnumber, setBeckmanLotnumber] = useState(0)
-    const [BeckmanType, setBeckmanType] = useState('1')
-    const [BeckmanMonth, setBeckmanMonth] = useState(1)
-    const [BeckmanYear, setBeckmanYear] = useState(0)
-    const [BeckmanLot, setBeckmanLot] = useState('0000')
-    const [BeckmanNumber, setBeckmanNumber] = useState('0001')
-    const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
-    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
     const [bottleSizeCode, setBottleSizeCode] = useState(1)
-    const [reagentType, setReagentType] = useState(0)
     const [expiryYear, setExpiryYear] = useState(0)
     const [expiryMonth, setExpiryMonth] = useState(0)
     const [expiryDay, setExpiryDay] = useState(0)
@@ -35,28 +25,59 @@ const Fruno = () => {
     const [dayProduce, setDayProduce] = useState("")
     const [monthProduce, setMonthProduce] = useState("")
     const [yearProduce, setYearProduce] = useState("")
-    const [selectExpiryType, setSelectExpiryType] = useState("1")
     const [minSequenceNumber, setMinSequenceNumber] = useState(1)
     const [maxSequenceNumber, setMaxSequenceNumber] = useState(minSequenceNumber)
-    const [minSequenceNumber_once, setMinSequenceNumber_once] = useState(1)
-    const [maxSequenceNumber_once, setMaxSequenceNumber_once] = useState(1)
+    const [minSequenceNumber_once, setMinSequenceNumber_once] = useState("1")
+    const [maxSequenceNumber_once, setMaxSequenceNumber_once] = useState("1")
     const [code, setCode] = useState({})
-    const [dataExel, setDataExel] = useState([])
     const [isCopy, setIsCopy] = useState(false);
     const [isExport, setIsExport] = useState(false);
-    const [isExport1, setIsExport1] = useState(false);
-    const [reloadClicked, setReloadClicked] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [changeImage, setChangeImage] = useState("1");
     const [barcode, setBarcode] = useState("001011141000100018")
     const [barcodeInfo, setBarcodeInfo] = useState({})
-    const token = localStorage.getItem("token")
-    const uid = localStorage.getItem("uid")
+    const [error,setError]= useState(false)
+    const [error1,setError1]= useState(false)
+    const [loading, setLoading] = useState(false);
     //console.log(token)
 
     const exportToExcel = async () => {
         try {
-
+            const err_arr = []
+            if (companyCode == 0) {
+                err_arr.push("Company Code")
+            }
+            if (dayProduce == 0) {
+                err_arr.push("Day Produce")
+            }
+            if (monthProduce == 0) {
+                err_arr.push("Month Produce")
+            }
+            if (yearProduce == 0) {
+                err_arr.push("Year Produce")
+            }
+            if (expiry_Month == 0) {
+                err_arr.push("Expiry Month")
+            }
+            if (minSequenceNumber == 0) {
+                err_arr.push("Min Sequence Number")
+            }
+            if (maxSequenceNumber == 0) {
+                err_arr.push("Max Sequence Number")
+            }
+            if (lotNumber == 0) {
+                err_arr.push("Lot Number")
+            }
+    
+            if (err_arr.length > 0) {
+                const errorMessage = "Nhập đầy đủ thông tin sau: " + err_arr.join(', ');
+                alert(errorMessage);
+                return
+            }
+            if(parseInt(minSequenceNumber)>parseInt(maxSequenceNumber)){
+                alert("Số bắt đầu không được lớn hơn số kết thúc");
+                return
+            }
             const dataBarcode = {
                 CompanyCode: companyCode,
                 MethodCode: methodCode,
@@ -74,46 +95,37 @@ const Fruno = () => {
                 MaxSequenceNumber: maxSequenceNumber,
                 SequenceNumber: sequenceNumber,
             }
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                    'x-user-id': uid
-                },
-            };
-            try {
-                axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
-                    .then((res) => {
-                        if (res.data.code === 200) {
-                            //setCode(data.data)
-                            console.log(res.data.data)
-                            if (res.data.data !== null || res.data.data.length != 0) {
-                                const data = transformArray(res.data.data);
-                                const ws = XLSX.utils.json_to_sheet(data);
-                                const wb = XLSX.utils.book_new();
-                                XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                                XLSX.writeFile(wb, `${res.data.methodecode}_${res.data.bottlesize}_${res.data.reagenttype}_${res.data.dayProduce}_from_${res.data.min}_to_${res.data.max}.xlsx`);
-                                alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
-                            } else {
-                                alert("Có lỗi xảy ra!")
-                            }
-
-
-                        }
-                        else if (res.data.code === 204) {
-                            alert("Ngày tháng năm không hợp lệ!")
-                        }
-                    })
-                    .catch((err) => {
-                        throw err
-                    })
-            } catch (error) {
-                console.error(error)
+           // console.log(dataBarcode)
+            setLoading(true)
+            const res = await FrunoGenator(dataBarcode)
+            setLoading(false)
+            if (res.data.code === 200) {
+                //setCode(data.data)
+                //  console.log(res.data.data)
+                if (res.data.data !== null || res.data.data.length != 0) {
+                    const data = transformArray(res.data.data);
+                    const ws = XLSX.utils.json_to_sheet(data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    XLSX.writeFile(wb, `${res.data.methodecode}_${res.data.bottlesize}_${res.data.reagenttype}_${res.data.dayProduce}_from_${res.data.min}_to_${res.data.max}.xlsx`);
+                    setTimeout(() => {
+                        alert('Export file thành công! Kiểm tra trong thư mục Tải xuống');
+                      }, 500); 
+                } else {
+                    setLoading(false)
+                    alert("Có lỗi xảy ra!")
+                }
+            }
+            else if (res.data.code === 204) {
+                alert("Ngày tháng năm không hợp lệ!")
             }
 
 
+
+
+
         } catch (error) {
-            console.error('Lỗi khi ghi file:', error);
+           // console.error('Lỗi khi ghi file:', error);
             alert('Đã xảy ra lỗi khi ghi file Excel!');
         }
     };
@@ -136,8 +148,11 @@ const Fruno = () => {
         if (expiry_Month == 0) {
             err_arr.push("Expiry Month")
         }
-        if (minSequenceNumber == 0) {
+        if (minSequenceNumber_once == 0) {
             err_arr.push("Min Sequence Number")
+        }
+        if (lotNumber == 0) {
+            err_arr.push("Lot Number")
         }
 
         if (err_arr.length > 0) {
@@ -145,7 +160,15 @@ const Fruno = () => {
             alert(errorMessage);
             return
         }
-
+        
+        if(parseInt(lotNumber)>999){
+            alert("Lot Number tối đa gồm 3 chữ số");
+            return;
+        }
+        if(parseInt(minSequenceNumber_once)>9999){
+            alert("Số thứ tự lộ tối đa gồm 4 chữ số");
+            return;
+        }
         const dataBarcode = {
             CompanyCode: companyCode,
             MethodCode: methodCode,
@@ -163,17 +186,13 @@ const Fruno = () => {
             MaxSequenceNumber: maxSequenceNumber_once,
             SequenceNumber: sequenceNumber,
         }
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'x-user-id': uid
-            },
-        };
+        //console.log(dataBarcode)
         try {
-            const data = await axios.post("https://barcodeserver-latest-b6nu.onrender.com/barcode/genator", dataBarcode, config)
+            setLoading(true)
+            setIsExport(false)
+            const data = await FrunoGenator(dataBarcode)
             // console.log(data.data)
-
+            setLoading(false)
             if (data.data) {
                 if (data.data.code === 200) {
                     setCode(data.data)
@@ -188,7 +207,8 @@ const Fruno = () => {
                 }
             }
         } catch (error) {
-
+            setLoading(false)
+            console.error(error)
         }
 
     }
@@ -209,24 +229,33 @@ const Fruno = () => {
     }
 
     const handleMinChange = (e) => {
-        const newMin = parseInt(e.target.value);
-
-
-        setMinSequenceNumber(newMin);
-        if (newMin > maxSequenceNumber) {
-            setMaxSequenceNumber(newMin);
-        }
+       
+        setMinSequenceNumber(e.target.value);
+      
 
 
     };
     const handleMinchange_once = (e) => {
-        const newMin = parseInt(e.target.value);
-        setMinSequenceNumber_once(newMin);
-        setMaxSequenceNumber_once(newMin)
+       // const newMin = parseInt(e.target.value);
+        setMinSequenceNumber_once(e.target.value);
+        setMaxSequenceNumber_once(e.target.value)
     }
+    useEffect(()=>{
+        if(parseInt(minSequenceNumber_once)>9999||parseInt(maxSequenceNumber_once)>9999){
+            setError(true)
+        }else{
+            setError(false)
+        }
+    },[minSequenceNumber_once,maxSequenceNumber_once])
+    useEffect(()=>{
+        if(parseInt(minSequenceNumber)>9999||parseInt(maxSequenceNumber)>9999){
+            setError1(true)
+        }else{
+            setError1(false)
+        }
+    },[minSequenceNumber,maxSequenceNumber])
     const handleMaxChange = (e) => {
-        const newMax = parseInt(e.target.value);
-        setMaxSequenceNumber(newMax);
+        setMaxSequenceNumber(e.target.value);
     };
     const transformArray = (inputArray) => {
         return inputArray.map((code, index) => ({
@@ -235,7 +264,7 @@ const Fruno = () => {
         }));
     };
     const handleReload = (id, item) => {
-        console.log(id)
+        // console.log(id)
         const element = document.getElementById(id)
 
         element.innerHTML = '  <img style="width: 250px; height: 60px;" alt="Barcode Generator TEC-IT -' + item + '" src="https://barcode.tec-it.com/barcode.ashx?data=' + item + '&code=Code25IL" style= "maxWidth: 250px" /> '
@@ -250,19 +279,14 @@ const Fruno = () => {
     }, []); // Dấu ngoặc vuông rỗng đảm bảo useEffect chỉ chạy một lần sau khi component được mount
 
     const handleRead = async () => {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'x-user-id': uid
-            },
-        };
         if (barcode.length != 18) {
             alert("Mã vạch phải đủ 18 kí tự!")
             return
         }
         try {
-            const data = await axios.get(`https://barcodeserver-latest-b6nu.onrender.com/barcode/read?code=${barcode}`, config)
+            setLoading(true)
+            const data = await FrunoRead(barcode)
+            setLoading(false)
             // console.log(data)
             if (data.data) {
                 // console.log(data.data.methodcode)
@@ -278,6 +302,7 @@ const Fruno = () => {
             }
             // console.log(barcodeInfo.methodcode)
         } catch (error) {
+            setLoading(false)
             console.error(error)
         }
 
@@ -356,34 +381,29 @@ const Fruno = () => {
 
         }
     }, [methodCode])
-    
-    return (
-        <div className="container">
-            <div style={{margin: "10px"}} >
-                <a href='https://www.tec-it.com' title='Barcode Software by TEC-IT' target='_blank'>
 
-                </a>
-                <span style={{ fontWeight: "bold", fontSize: "1.5rem" }}>Fruno CA</span>
-            </div>
-            <div className={`tab_container`} >
+    return (
+    <div className="main_contain">
+    <div className={`tab_container`} >
                 <div onClick={() => setSelectedTab(1)} className={`tab_container-item ${selectedTab == 1 && "active"}`}>Tạo mã lẻ</div>
                 <div onClick={() => setSelectedTab(2)} className={`tab_container-item ${selectedTab == 2 && "active"}`}>Tạo nhiều mã</div>
                 <div onClick={() => setSelectedTab(3)} className={`tab_container-item ${selectedTab == 3 && "active"}`}>Đọc</div>
-               
+
             </div>
+        <div className="container">
+            <div style={{ margin: "10px" }} >
+                <a href='https://www.tec-it.com' title='Barcode Software by TEC-IT' target='_blank'>
+
+                </a>
+              
+            </div>
+            
             {selectedTab == 1 &&
                 <div className="container_barcode">
-                    
-                    {/*
-                        <div className="barcode_item">
-                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Company Code (Không đổi)</span>
-                        <input type="text" value={companyCode} onChange={(e) => setCompanyCode(e.target.value)}></input>
-                    </div>
-                    */}
 
-<div className="barcode_item">
+                    <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
-                        
+
                         <select value={methodCode} onChange={(e) => setMethodCode(e.target.value)}>
                             <option value={1}>ALB (Albumin)</option>
                             <option value={20}>ALT (GPT)</option>
@@ -409,25 +429,25 @@ const Fruno = () => {
                             <option value={25}>LDH</option>
 
                         </select>
-                        
+
                         <>
-                        <span >Code  : {formatNumber(methodCode)}  </span>
-                        <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
+                            <span >Code  : {formatNumber(methodCode)}  </span>
+                            <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
 
                         </>
-                           
 
-                        
-                      
+
+
+
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
-                      
+
                         <select value={bottleSizeCode} onChange={(e) => setBottleSizeCode(e.target.value)}>
                             <option value={1}>20ml (square)</option>
                             <option value={3}>70ml</option>
                         </select>
-                        
+
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
@@ -436,14 +456,6 @@ const Fruno = () => {
                             <option value={2}>R2</option>
                         </select>
                     </div>
-                    {/**  <div className="barcode_item" style={{ display: "none" }}>
-
-                    <select value={selectExpiryType} onChange={(e) => setSelectExpiryType(e.target.value)}>
-                        <option value={1}>Thời gian chính xác</option>
-                        <option value={2}>Từ thời gian sản xuất</option>
-                    </select>
-                </div> */}
-
 
 
                     <div className="barcode_item">
@@ -451,15 +463,15 @@ const Fruno = () => {
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Ngày sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="text" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Tháng sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="text" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Năm sản xuất</span>
-                                <input style={{ width: "100px" }} type="number" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="text" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
                             </div>
                             <button onClick={handleSetToday} style={{ "width": "70px", }}>Hôm nay</button>
                         </div>
@@ -467,51 +479,39 @@ const Fruno = () => {
 
 
                     <div className="barcode_item">
-                        
-                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
+
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
                         <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
-                       
-                       
-                       
+
+
+
                     </div>
                     <div className="barcode_item">
-                      
+
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
                         </span>
-                        <input type="number" required min={0} value={minSequenceNumber_once} onChange={handleMinchange_once}></input>
-                       
-                      
-                        {/**
-                         *  <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
-                            <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span>Min Sequence Number (Bắt đầu từ)</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={minSequenceNumber} onChange={handleMinChange}></input>
-                            </div>
-                            <div style={{ display: "flex", flexDirection: "column" }}>
-                                <span>Max Sequence Number (Kết thúc)</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
-                            </div>
-                        </div>
-                         */}
+                        <input type="text" required  value={minSequenceNumber_once} onChange={handleMinchange_once}></input>
+                        {error && <span style={{ color: "red" }}> Bạn đang nhập số thứ tự lọ lớn hơn 4 chữ số!</span>}
 
                     </div>
-                    <div className="barcode_item" style={{ "width": "150px", "margin": "auto", }}>
-                      
-                         <button style={{ marginBottom: "10px" }} onClick={handleSubmit}>Tạo mã</button>
-                        
-                       
-                        {/** 
-                        * {isExport && <button onClick={exportToExcel}>Xuất File Exels</button>}
-                       */}
+                    {!error&&
+                     <div className={`barcode_item sumbit_contain button-container login-form ${loading ? 'loading' : ''}`} style={{ "width": "150px", "margin": "auto", }}>
 
-
-                    </div>
+                     <div className="button_submit" style={{ width:"100%" }} onClick={handleSubmit}>Tạo mã</div>
+                     {loading && 
+                 <div className="loading-overlay">
+                     <ClipLoader color="#000" loading={loading} size={50} />
+                 </div>
+             }
+                 </div>
+                    }
                    
+
                     {isExport &&
                         <div className="barcode_item" >
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Ngày hết hạn ước tính (ngày-tháng-năm): {convertDateStringToCustomFormat(code?.date)}</span>
                         </div>}
-                       
+
 
                     <div className="barcode_item barcode_render_contain" style={{ "margin": "auto" }} >
                         {isExport &&
@@ -520,14 +520,10 @@ const Fruno = () => {
                                 <option value={2}>Tec-it</option>
                             </select>}
 
-                        {code?.data?.length !== 0&&machineCode==1 && code?.data?.map((item, index) => (
+                        {isExport&&code?.data?.length !== 0 && machineCode == 1 && code?.data?.map((item, index) => (
                             <div key={index} className="barcode_render">
                                 <div className="barcode_render_img" >
                                     <LazyLoadComponent delayTime={200}>
-
-                                        {/**
-                     * 
-                     */}
                                         {changeImage == "2" ? (
                                             <div style={{ width: '250px', height: "60px" }} >
                                                 <div id={`img_code_${index}`}>
@@ -567,20 +563,6 @@ const Fruno = () => {
                                     </div>
 
                                 </div>
-                                {/*
-                                    <div>
-                                    <ul className="barcode_render_detail" style={{ marginBottom: "0", fontSize: "14px" }}>
-                                        <li><span>Company Code: </span>{extractSubstring(item, 0, 2)}</li>
-                                        <li><span>Method:</span> {getMethodNameByCode(extractSubstring(item, 3, 4))}</li>
-                                        <li><span>Bottle Size:</span> {getBottleSizeNameByCode(extractSubstring(item, 5, 5))}</li>
-                                        <li><span>Reagent Type:</span> {getReagentTypeNameByCode(extractSubstring(item, 6, 6))}</li>
-                                        <li><span>Day Expiry(d/m/y):</span> {convertDateStringToCustomFormat(code?.date)}</li>
-                                        <li><span>Lot Number:</span> {extractSubstring(item, 10, 12)} </li>
-                                        <li><span>Bottle Sequence Number:</span> {extractSubstring(item, 13, 16)}</li>
-                                    </ul>
-                                </div>
-                                */}
-
                             </div>
                         ))}
                     </div>
@@ -588,19 +570,9 @@ const Fruno = () => {
             }
             {selectedTab == 2 &&
                 <div className="container_barcode">
-                    {/*
-                    <div className="barcode_item">
-                    <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Company Code (Không đổi)</span>
-                    <input type="text" value={companyCode} onChange={(e) => setCompanyCode(e.target.value)}></input>
-                </div>
-                */}
-                   
-
-
-                    
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Method (Loại hóa chất)</span>
-                       
+
                         <select value={methodCode} onChange={(e) => setMethodCode(e.target.value)}>
                             <option value={1}>ALB (Albumin)</option>
                             <option value={20}>ALT (GPT)</option>
@@ -626,26 +598,26 @@ const Fruno = () => {
                             <option value={25}>LDH</option>
 
                         </select>
-                      
-                        
-                        
+
+
+
                         <span >Code  : {formatNumber(methodCode)}  </span>
                         <span >Tháng hết hạn của {getMethodNameByValue(methodCode)} : {expiry_Month} tháng!</span>
 
-                     
-                           
 
-                        
-                    
+
+
+
+
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
-                       
+
                         <select value={bottleSizeCode} onChange={(e) => setBottleSizeCode(e.target.value)}>
                             <option value={1}>20ml (square)</option>
                             <option value={3}>70ml</option>
                         </select>
-                     
+
                     </div>
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
@@ -654,15 +626,6 @@ const Fruno = () => {
                             <option value={2}>R2</option>
                         </select>
                     </div>
-                    {/**  <div className="barcode_item" style={{ display: "none" }}>
-
-                    <select value={selectExpiryType} onChange={(e) => setSelectExpiryType(e.target.value)}>
-                        <option value={1}>Thời gian chính xác</option>
-                        <option value={2}>Từ thời gian sản xuất</option>
-                    </select>
-                </div> */}
-
-
 
                     <div className="barcode_item">
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Ngày sản xuất:</span>
@@ -685,16 +648,16 @@ const Fruno = () => {
 
 
                     <div className="barcode_item">
-                       
-                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
+
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
                         <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
-                      
-                       
-                       
+
+
+
                     </div>
                     <div className="barcode_item">
-                       
-                            <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
+
+                        <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
                         </span>
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
@@ -706,24 +669,18 @@ const Fruno = () => {
                                 <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
                             </div>
                         </div>
-                      
-                      
-                        {/**<input type="number" min={0} value={minSequenceNumber} onChange={handleMinchange_once}></input> */}
-                        {/**
-                     * 
-                     */}
-
+                        {error1 && <span style={{ color: "red" }}> Bạn đang nhập số thứ tự lọ lớn hơn 4 chữ số!</span>}
                     </div>
-                    <div className="barcode_item" style={{ "width": "150px", "margin": "auto", }}>
-                       <button onClick={exportToExcel}>Xuất File Exels</button>
-                      
-                       
-                        {/** 
-                    * {isExport && }
-                   */}
-
-                        {/*  */}
-                    </div>
+                    {!error1&&
+                     <div className={`barcode_item sumbit_contain button-container login-form ${loading ? 'loading' : ''}`} style={{ "width": "150px", "margin": "auto", }}>
+                     <div style={{ "width": "100%", }} onClick={exportToExcel}>Xuất File Exels</div>
+                     {loading && 
+              <div className="loading-overlay">
+                  <ClipLoader color="#000" loading={loading} size={50} />
+              </div>
+          }
+                 </div>}
+                   
 
 
 
@@ -735,8 +692,16 @@ const Fruno = () => {
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Nhập số mã vạch để trích xuất thông tin</span>
                         <input type="text" value={barcode} onChange={(e) => setBarcode(e.target.value)}></input>
                     </div>
-                    <button onClick={() => handleRead()} style={{ "width": "70px", }}>Đọc</button>
-                    {barcodeInfo != null &&
+                    <div className={`barcode_item sumbit_contain button-container login-form ${loading ? 'loading' : ''}`} >
+                        <div onClick={() => handleRead()} style={{ "width": "100%", }}>Đọc</div>
+                        {loading && 
+               <div className="loading-overlay">
+                   <ClipLoader color="#000" loading={loading} size={50} />
+               </div>
+           }
+                    </div>
+                    
+                    {!loading&&barcodeInfo.bottlesequence  &&
                         <ul className="barcode_render_detail" style={{ marginBottom: "0", fontSize: "14px" }}>
                             <li><span>Company Code: </span>{barcodeInfo.companycode}</li>
                             <li><span>Method:</span> {barcodeInfo.methodcode}</li>
@@ -750,53 +715,16 @@ const Fruno = () => {
                 </div>
             }
 
-           
 
 
+
+        </div>
         </div>
     )
 }
 
 
-function calculateMonthYear(startDate, months) {
-    // Chuyển đổi ngày bắt đầu thành đối tượng Date
-       // Chuyển đổi ngày bắt đầu thành đối tượng Date
-       const date = new Date(startDate);
 
-       // Kiểm tra xem ngày bắt đầu có hợp lệ hay không
-       if (isNaN(date.getTime())) {
-           throw new Error('Ngày bắt đầu không hợp lệ');
-       }
-   
-       // Thêm số tháng vào ngày bắt đầu
-       date.setMonth(date.getMonth() + months);
-   
-       // Lấy ngày mới
-       const newDay = date.getDate();
-       const newMonth = date.getMonth() + 1; // Tháng trong JavaScript bắt đầu từ 0, nên cần cộng thêm 1
-       const newYear = date.getFullYear();
-   
-       // Định dạng tháng để có hai chữ số
-       const formattedMonth = newMonth < 10 ? '0' + newMonth : newMonth;
-   
-       // Định dạng ngày để có hai chữ số
-       const formattedYear = newYear.toString().slice(-2);
-       // Trả về chuỗi dạng "DD/MM/YYYY"
-       return `${formattedMonth}${formattedYear}`;
-   
-}
-
-function padToFiveDigits(number) {
-    // Chuyển đổi số thành chuỗi
-    let numberStr = number.toString();
-
-    // Kiểm tra độ dài của chuỗi và thêm số 0 vào đầu chuỗi cho đến khi độ dài đạt 5
-    while (numberStr.length < 5) {
-        numberStr = '0' + numberStr;
-    }
-
-    return numberStr;
-}
 function formatNumber(num) {
     const paNum = parseInt(num)
     if (paNum >= 1 && paNum <= 9) {
@@ -806,70 +734,9 @@ function formatNumber(num) {
     }
 }
 
-function getMethodNameByCode(code) {
-    const methodOptions = [
-        { value: 1, label: 'ALB (Albumin)' },
-        { value: 20, label: 'ALTGPT (ALT)' },
-        { value: 5, label: 'AMY_IF (Amylase)' },
-        { value: 19, label: 'ASTGOT (AST)' },
-        { value: 48, label: 'BIL-Dv' },
-        { value: 49, label: 'BIL-Tv' },
-        { value: 10, label: 'TC-CHO (Total Cholesterol)' },
-        { value: 13, label: 'CK-MB' },
-        { value: 15, label: 'CRE_Ja' },
-        { value: 36, label: 'CRP' },
-        { value: 8, label: 'Ca_A3' },
-        { value: 16, label: 'GGT' },
-        { value: 17, label: 'GNU_HK' },
-        { value: 11, label: 'HDL-C (HDL-Cholesterol)' },
-        { value: 12, label: 'LDN-C (LDL-Cholesterol)' },
-        { value: 30, label: 'TG (Total Triglycerides)' },
-        { value: 29, label: 'TP (Total Protein)' },
-        { value: 32, label: 'UA (Uric Acid)' },
-        { value: 31, label: 'UREA (Urea)' },
-        { value: 37, label: 'HbA1c' },
-        { value: 2, label: 'ALP' },
-        { value: 14, label: 'CK' },
-        { value: 35, label: 'CRE (Creatinine)' },
-        { value: 6, label: 'BIL-D (Bilirubin Direct)' },
-        { value: 18, label: 'GLU (Glucose)' },
-        { value: 25, label: 'LDH (Lactate Dehydrogenase)' },
-        { value: 7, label: 'BIL-T (Bilirubin Total)' },
-    ];
-
-    const selectedMethod = methodOptions.find(method => method.value.toString() === code.toString());
-    //  console.log(selectedMethod)
-    return selectedMethod ? selectedMethod.label : null;
-}
-
-const beckmanMethodMap = {
-    '002': 'ALB',
-    '034': 'UN',
-    '007': 'ALT',
-    '009': 'AST',
-    '098': 'UA',
-    '032': 'TP',
-    '004': 'ALP',
-    '006': 'AMY',
-    '079': 'CK',
-    '155': 'CK-MB',
-    '078': 'CRE',
-    '047': 'CRP',
-    '011': 'DBIL',
-    '020': 'GGT',
-    '021': 'GLU',
-    '087': 'HDL',
-    '026': 'LDH',
-    '083': 'LDL',
-    '012': 'TBIL',
-    '016': 'TC',
-    '118': 'TG'
-};
 
 // Hàm nhận vào một chuỗi giá trị và trả về tên tương ứng
-function getMethodName(value) {
-    return beckmanMethodMap[value] || 'Không tìm thấy tên tương ứng';
-}
+
 function convertDateStringToCustomFormat(dateString) {
     const originalDate = new Date(dateString);
 
@@ -917,14 +784,15 @@ function getMethodNameByValue(value) {
 
     return selectedMethod ? selectedMethod.label : null;
 }
-const FrunoPage = ()=>{
+const FrunoPage = () => {
     const navigate = useNavigate()
     return (
-        <>
-         <button onClick={()=>{navigate('/beckman')}}>Đổi máy</button>
-            <Fruno/>
-           
-        </>
+        <div style={{display:"flex", flexDirection:'column', marginBottom:"10px"}}>  
+        <span style={{ fontWeight: "bold", fontSize: "1.5rem", marginBottom:"10px" }}>Fruno CA</span>
+            <button style={{width:"80px", height:"30px", margin:"auto", marginBottom:"20px"}} onClick={() => { navigate('/beckman') }}>Đổi máy</button>
+            <Fruno />
+
+        </div>
     )
 }
 export default FrunoPage

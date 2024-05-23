@@ -1,35 +1,31 @@
 import React, { useState } from "react";
 import "./styles.css";
-import axios from "axios";
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
-
 import { setLoginStatus, setToken, setUid } from '../redux/actions/auth';
+import { LoginApi } from "../api/auth.api";
 
 const Login = () => {
     const [errorMessages, setErrorMessages] = useState({});
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [username, setUsername] = useState("");
     const [passwd, setPasswd] = useState("");
     const [loading, setLoading] = useState(false);
-    const isLogin = useSelector(state => state.auth.isLogin);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+   
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async(event) => {
         // Prevent page reload
         event.preventDefault();
         setLoading(true);
-        const dataBarcode = {
-            username: username,
-            passwd: passwd
-        };
-        axios.post("https://barcodeserver-latest-b6nu.onrender.com/auth/login", dataBarcode)
-            .then((data) => {
-                console.log(data);
+        try {
+            const data = await LoginApi(username,passwd)
+            if(data){
                 setLoading(false);
                 if (data.data.code === 200) {
+                    localStorage.setItem("isSignin", true)
+                    localStorage.setItem("refreshToken",data.data.refreshToken )
                     dispatch(setLoginStatus(true));
                     dispatch(setToken(data.data.token));
                     dispatch(setUid(data.data.uid));
@@ -37,11 +33,13 @@ const Login = () => {
                 } else if (data.data.code === 500) {
                     alert("Thông tin đăng nhập không đúng!");
                 }
-            })
-            .catch((err) => {
-                setLoading(false);
-                console.error(err);
-            });
+            }
+        } catch (error) {
+            setLoading(false);
+            console.error(error);
+        }
+        
+      
     };
 
     // Generate JSX code for error message

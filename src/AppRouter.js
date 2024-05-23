@@ -1,24 +1,23 @@
 // AppRouter.js
-import React, { useEffect } from 'react';
-import { Router,Routes ,Route, Navigate } from 'react-router-dom';
-import Login from './Pages/Login'; // Import các component bạn muốn hiển thị
-import { useSelector, useDispatch } from 'react-redux';
-import Barcode1 from './barcode';
-import Err from './dangnhap.err';
+import React from 'react';
+import { Routes ,Route, Navigate } from 'react-router-dom';
+import Login from './Pages/Login'; 
+import { useSelector } from 'react-redux';
 import Homepage from './Pages/Home';
 import FrunoPage from './Screens/Fruno';
 import BeckmanPage from './Screens/Beckman';
+
 const AppRouter = () => {
+    
     const isLogin = useSelector(state => state.auth.isLogin);
-   
-    //console.log(isLogin)
+  
   return (
     <Routes>
-    <Route exact path="/" element={ <Login />} />
-    <Route exact path="/home" element={ <Homepage />} />
-    <Route exact path="/fruno" element={ <FrunoPage />} />
-    <Route exact path="/beckman" element={ <BeckmanPage />} />
-    <Route path="/barcode" element={isLogin  ? <Barcode1 /> : <Navigate to="/" />} />
+    <Route exact path="/" element={isLogin?<Navigate to="/home" /> : <Login />} />
+    <Route exact path="/home" element={isLogin? <Homepage />: <Navigate to="/" />} />
+    <Route exact path="/fruno" element={isLogin? <FrunoPage />: <Navigate to="/" />} />
+    <Route exact path="/beckman" element={isLogin? <BeckmanPage />: <Navigate to="/" />} />
+    
   </Routes>
   
   
