@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { BeckmanGenator, BeckmanRead } from "../api/beckman.api";
 import { ClipLoader } from 'react-spinners';
 import "../Pages/styles.css"
+const numericPattern = /^[0-9]+$/;
 const Beckman = () => {
     const [BeckmanCode, setBeckmancode] = useState()
     const [BeckmanmethodCode, setBeckmanMethodCode] = useState('002')
@@ -42,12 +43,18 @@ const Beckman = () => {
                 alert("Lot number gồm đủ 4 chữ số!")
                 return
             }
+            if (!numericPattern.test(BeckmanLot)) {
+                alert("Mã vạch không bao gồm ký tự chữ!")
+                return 
+            } 
            // console.log(BeckmanminNumber, BeckmanmaxNumber);
             if (BeckmanminNumber.length > 5 || BeckmanmaxNumber.length > 5) {
                 //  console.log(BeckmanminNumber, BeckmanmaxNumber);
                 alert("Số SEQ tối đa gồm 5 chữ số!");
                 return;
             }
+           
+
             if (parseInt(BeckmanminNumber) > parseInt(BeckmanmaxNumber)) {
                 //  console.log(BeckmanminNumber, BeckmanmaxNumber);
                 alert("Số bắt đầu phải nhỏ hơn số kết thúc");
@@ -104,6 +111,12 @@ const Beckman = () => {
                 alert("SEQ không hợp lệ")
                 return
             }
+           
+            if (!numericPattern.test(BeckmanLot)) {
+                alert("Mã vạch không bao gồm ký tự chữ!")
+                return 
+            } 
+           
             //console.log()
             const day = `${yearProduce}-${formatNumber(monthProduce)}-${formatNumber(dayProduce)}`
             // alert(day)
@@ -253,9 +266,13 @@ const Beckman = () => {
 
 
     const handleRead = async () => {
-
+        const numericPattern = /^[0-9]+$/;
+        if (!numericPattern.test(barcode)) {
+            alert("Mã vạch không bao gồm ký tự chữ!")
+            return 
+        } 
         if (barcode.length != 20) {
-            alert("Mã vạch phải đủ 18 kí tự!")
+            alert("Mã vạch phải đủ 20 kí tự!")
             return
         }
         try {
@@ -387,7 +404,7 @@ const Beckman = () => {
 
 
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
-                        <input type="text" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
+                        <input type="number" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
 
 
                     </div>
@@ -562,7 +579,7 @@ const Beckman = () => {
 
 
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
-                        <input type="text" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
+                        <input type="number" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
 
 
                     </div>

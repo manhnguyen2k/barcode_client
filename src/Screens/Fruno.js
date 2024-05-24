@@ -68,7 +68,10 @@ const Fruno = () => {
             if (lotNumber == 0) {
                 err_arr.push("Lot Number")
             }
-    
+            if (lotNumber >999 ) {
+                alert("Lot number tối đa có 3 số!");
+                return
+            }
             if (err_arr.length > 0) {
                 const errorMessage = "Nhập đầy đủ thông tin sau: " + err_arr.join(', ');
                 alert(errorMessage);
@@ -165,6 +168,15 @@ const Fruno = () => {
             alert("Lot Number tối đa gồm 3 chữ số");
             return;
         }
+        const numericPattern = /^[0-9]+$/;
+        if (!numericPattern.test(lotNumber)) {
+            alert("Mã vạch không bao gồm ký tự chữ!")
+            return 
+        }
+        if (!numericPattern.test(minSequenceNumber_once)) {
+            alert("Mã vạch không bao gồm ký tự chữ!")
+            return 
+        } 
         if(parseInt(minSequenceNumber_once)>9999){
             alert("Số thứ tự lộ tối đa gồm 4 chữ số");
             return;
@@ -279,10 +291,16 @@ const Fruno = () => {
     }, []); // Dấu ngoặc vuông rỗng đảm bảo useEffect chỉ chạy một lần sau khi component được mount
 
     const handleRead = async () => {
+        const numericPattern = /^[0-9]+$/;
+        if (!numericPattern.test(barcode)) {
+            alert("Mã vạch không bao gồm ký tự chữ!")
+            return 
+        } 
         if (barcode.length != 18) {
             alert("Mã vạch phải đủ 18 kí tự!")
             return
         }
+
         try {
             setLoading(true)
             const data = await FrunoRead(barcode)
@@ -463,15 +481,15 @@ const Fruno = () => {
                         <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Ngày sản xuất</span>
-                                <input style={{ width: "100px" }} type="text" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={dayProduce} onChange={(e) => setDayProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Tháng sản xuất</span>
-                                <input style={{ width: "100px" }} type="text" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={monthProduce} onChange={(e) => setMonthProduce(e.target.value)}></input>
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Năm sản xuất</span>
-                                <input style={{ width: "100px" }} type="text" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
+                                <input style={{ width: "100px" }} type="number" value={yearProduce} onChange={(e) => setYearProduce(e.target.value)}></input>
                             </div>
                             <button onClick={handleSetToday} style={{ "width": "70px", }}>Hôm nay</button>
                         </div>
@@ -481,16 +499,13 @@ const Fruno = () => {
                     <div className="barcode_item">
 
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
-                        <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
-
-
-
+                        <input type="number" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
                     </div>
                     <div className="barcode_item">
 
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số thứ tự lọ:
                         </span>
-                        <input type="text" required  value={minSequenceNumber_once} onChange={handleMinchange_once}></input>
+                        <input type="number" required  value={minSequenceNumber_once} onChange={handleMinchange_once}></input>
                         {error && <span style={{ color: "red" }}> Bạn đang nhập số thứ tự lọ lớn hơn 4 chữ số!</span>}
 
                     </div>
@@ -650,7 +665,7 @@ const Fruno = () => {
                     <div className="barcode_item">
 
                         <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (3 chữ số cuối cùng của lot)</span>
-                        <input type="text" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
+                        <input type="number" value={lotNumber} onChange={(e) => setLotNumber(e.target.value)}></input>
 
 
 
