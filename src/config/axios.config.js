@@ -5,7 +5,7 @@ import { ClipLoader } from 'react-spinners';
 import { setLoginStatus, setToken, setUid } from '../redux/actions/auth';
 
 const client = axios.create({
-    baseURL: 'https://barcodeserver-latest-b6nu.onrender.com/',
+    baseURL: process.env.REACT_APP_SERVER_URL,
     headers: {
         'Content-Type': 'application/json',
         

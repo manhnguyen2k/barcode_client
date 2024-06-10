@@ -24,7 +24,7 @@ const Login = () => {
             if(data){
                 setLoading(false);
                 if (data.data.code === 200) {
-                    localStorage.setItem("isSignin", true)
+                  //  localStorage.setItem("isSignin", true)
                     localStorage.setItem("refreshToken",data.data.refreshToken )
                     dispatch(setLoginStatus(true));
                     dispatch(setToken(data.data.token));
