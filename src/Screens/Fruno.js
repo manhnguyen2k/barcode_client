@@ -810,4 +810,4 @@ const FrunoPage = () => {
         </div>
     )
 }
-export default FrunoPage
+export default Fruno
