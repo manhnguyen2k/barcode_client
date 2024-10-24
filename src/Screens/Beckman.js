@@ -479,7 +479,7 @@ const Beckman = () => {
 
 
                         </div>
-                        <div className="barcode_item">
+                        {/** <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
 
 
@@ -489,7 +489,8 @@ const Beckman = () => {
                                 <option value={'05'}>20ml</option>
                             </select>
 
-                        </div>
+                        </div> */}
+                       
                         <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
                             <select value={reagentTypeCode} onChange={(e) => setReagentTypeCode(e.target.value)}>
