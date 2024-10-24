@@ -539,7 +539,7 @@ const Beckman = () => {
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <span>Kết thúc</span>
-                                    <input style={{ width: "100px" }} type="text" min={0} value={BeckmanmaxNumber} onChange={(e) => setBeckmanMaxNumber(e.target.value)}></input>
+                                    <input disabled style={{ width: "100px" }} type="text" min={0} value={BeckmanmaxNumber} onChange={(e) => setBeckmanMaxNumber(e.target.value)}></input>
                                     {!error1 && <span >SEQ: {convertToFiveDigitString(BeckmanmaxNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanmaxNumber))} </span>}
                                 </div>
 

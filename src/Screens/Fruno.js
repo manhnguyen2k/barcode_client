@@ -696,7 +696,7 @@ const Fruno = () => {
                             </div>
                             <div style={{ display: "flex", flexDirection: "column" }}>
                                 <span>Kết thúc</span>
-                                <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
+                                <input disabled style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
                             </div>
                         </div>
                         {error1 && <span style={{ color: "red" }}> Bạn đang nhập số thứ tự lọ lớn hơn 4 chữ số!</span>}

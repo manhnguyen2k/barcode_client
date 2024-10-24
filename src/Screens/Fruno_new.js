@@ -281,6 +281,8 @@ const Fruno_new = () => {
         else { setErrSothutu(false) }
 
     }, [so_thu_tu_lo_lon, so_thu_tu_lo_nho])
+
+
     useEffect(() => {
         if (parseInt(minSequenceNumber_once) > 9999 || parseInt(maxSequenceNumber_once) > 9999) {
             setError(true)
@@ -288,6 +290,8 @@ const Fruno_new = () => {
             setError(false)
         }
     }, [minSequenceNumber_once, maxSequenceNumber_once])
+
+
     useEffect(() => {
         if (parseInt(minSequenceNumber) > 9999 || parseInt(maxSequenceNumber) > 9999) {
             setError1(true)
@@ -295,9 +299,13 @@ const Fruno_new = () => {
             setError1(false)
         }
     }, [minSequenceNumber, maxSequenceNumber])
+
+
     const handleMaxChange = (e) => {
         setMaxSequenceNumber(e.target.value);
     };
+
+
     const transformArray = (inputArray) => {
         return inputArray.map((code, index) => ({
             "Số thứ tự lọ": code.bottleLot,
@@ -305,6 +313,8 @@ const Fruno_new = () => {
         }));
     };
 
+
+    
      useEffect(()=>{
         if(parseInt(methodCode)==13){
             setBottleSizeCode(3)
@@ -750,7 +760,7 @@ const Fruno_new = () => {
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <span>Kết thúc</span>
-                                    <input style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
+                                    <input disabled style={{ width: "100px" }} type="number" min={0} value={maxSequenceNumber} onChange={handleMaxChange}></input>
                                 </div>
                             </div>
                             {error1 && <span style={{ color: "red" }}> Bạn đang nhập số thứ tự lọ lớn hơn 4 chữ số!</span>}
