@@ -7,7 +7,7 @@ import { LazyLoadComponent } from 'react-lazy-load-image-component';
 import CachedIcon from '@mui/icons-material/Cached';
 import { useNavigate } from "react-router-dom";
 import Barcode from 'react-jsbarcode';
-import { FrunoGenator, FrunoRead } from "../api/fruno.api";
+import { FrunoGenator_new, FrunoRead_new } from "../api/fruno.api";
 import { ClipLoader } from 'react-spinners';
 import "../Pages/styles.css"
 const Fruno_new = () => {
@@ -26,7 +26,7 @@ const Fruno_new = () => {
     const [monthProduce, setMonthProduce] = useState("")
     const [yearProduce, setYearProduce] = useState("")
     const [minSequenceNumber, setMinSequenceNumber] = useState(1)
-    const [maxSequenceNumber, setMaxSequenceNumber] = useState(minSequenceNumber)
+    const [maxSequenceNumber, setMaxSequenceNumber] = useState(minSequenceNumber+200)
     const [minSequenceNumber_once, setMinSequenceNumber_once] = useState("1")
     const [maxSequenceNumber_once, setMaxSequenceNumber_once] = useState("1")
     const [code, setCode] = useState({})
@@ -34,7 +34,7 @@ const Fruno_new = () => {
     const [isExport, setIsExport] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [changeImage, setChangeImage] = useState("1");
-    const [barcode, setBarcode] = useState("001011141000100018")
+    const [barcode, setBarcode] = useState("084013164200101018")
     const [barcodeInfo, setBarcodeInfo] = useState({})
     const [error, setError] = useState(false)
     const [error1, setError1] = useState(false)
@@ -84,6 +84,8 @@ const Fruno_new = () => {
                 alert("Số bắt đầu không được lớn hơn số kết thúc");
                 return
             }
+            
+         
             const dataBarcode = {
                 CompanyCode: companyCode,
                 MethodCode: methodCode,
@@ -103,7 +105,7 @@ const Fruno_new = () => {
             }
             // console.log(dataBarcode)
             setLoading(true)
-            const res = await FrunoGenator(dataBarcode)
+            const res = await FrunoGenator_new(dataBarcode)
             setLoading(false)
             if (res.data.code === 200) {
                 //setCode(data.data)
@@ -222,7 +224,7 @@ const Fruno_new = () => {
         try {
             setLoading(true)
             setIsExport(false)
-            const data = await FrunoGenator(dataBarcode)
+            const data = await FrunoGenator_new(dataBarcode)
             // console.log(data.data)
             setLoading(false)
             if (data.data) {
@@ -263,7 +265,7 @@ const Fruno_new = () => {
     const handleMinChange = (e) => {
 
         setMinSequenceNumber(e.target.value);
-
+        setMaxSequenceNumber(parseInt(e.target.value)+200)
 
 
     };
@@ -302,6 +304,23 @@ const Fruno_new = () => {
             "Bar Code": code.code
         }));
     };
+
+     useEffect(()=>{
+        if(parseInt(methodCode)==13){
+            setBottleSizeCode(3)
+        }else{
+            if(parseInt(reagentTypeCode)==1){
+                setBottleSizeCode(3)
+            }
+            if(parseInt(reagentTypeCode)==2){
+                setBottleSizeCode(1)
+            }
+        }
+     },[methodCode,reagentTypeCode ])
+
+    
+
+
     const handleReload = (id, item) => {
         // console.log(id)
         const element = document.getElementById(id)
@@ -312,10 +331,16 @@ const Fruno_new = () => {
         // console.log(`https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`)
         //  element.src = `https://barcode.tec-it.com/barcode.ashx?data=${item}&code=Code25IL`
     }
+
+
+
     useEffect(() => {
         // Gọi hàm handleSetToday khi component được mount
         handleSetToday();
     }, []); // Dấu ngoặc vuông rỗng đảm bảo useEffect chỉ chạy một lần sau khi component được mount
+
+
+
 
     const handleRead = async () => {
         const numericPattern = /^[0-9]+$/;
@@ -330,7 +355,7 @@ const Fruno_new = () => {
 
         try {
             setLoading(true)
-            const data = await FrunoRead(barcode)
+            const data = await FrunoRead_new(barcode)
             setLoading(false)
             // console.log(data)
             if (data.data) {
@@ -668,7 +693,7 @@ const Fruno_new = () => {
 
 
                         </div>
-                        <div className="barcode_item">
+                        {/* <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
 
                             <select value={bottleSizeCode} onChange={(e) => setBottleSizeCode(e.target.value)}>
@@ -676,7 +701,8 @@ const Fruno_new = () => {
                                 <option value={3}>70ml</option>
                             </select>
 
-                        </div>
+                        </div> */}
+                       
                         <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Reagent type (Loại thuốc thử)</span>
                             <select value={reagentTypeCode} onChange={(e) => setReagentTypeCode(e.target.value)}>

@@ -21,8 +21,8 @@ const Beckman = () => {
     const [BeckmanMonth, setBeckmanMonth] = useState(1)
     const [BeckmanLot, setBeckmanLot] = useState('0001')
     const [BeckmanNumber, setBeckmanNumber] = useState('0001')
-    const [BeckmanminNumber, setBeckmanMinNumber] = useState('0001')
-    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('0001')
+    const [BeckmanminNumber, setBeckmanMinNumber] = useState('1')
+    const [BeckmanmaxNumber, setBeckmanMaxNumber] = useState('1')
     const [reagentTypeCode, setReagentTypeCode] = useState(1)
     const [dayProduce, setDayProduce] = useState("")
     const [monthProduce, setMonthProduce] = useState("")
@@ -267,6 +267,28 @@ const Beckman = () => {
         else { setErrSothutu(false) }
 
     }, [so_thu_tu_lo_lon, so_thu_tu_lo_nho])
+
+
+
+     const handleChangeMinNumber = (value) => {
+        if(value){setBeckmanMinNumber(value)
+            setBeckmanMaxNumber((parseInt(value) + 200).toString())}
+        
+     }
+
+     useEffect(()=>{
+        if(parseInt(BeckmanmethodCode)==813){
+            setBeckmanBottleSize('03')
+        }
+        else{
+            if(reagentTypeCode==1){
+                setBeckmanBottleSize('03')
+            }
+            if(reagentTypeCode==2){
+                setBeckmanBottleSize('05')}
+        }
+     }, [BeckmanmethodCode, reagentTypeCode])
+
     return (
         <div className="main_contain">
             <div className={`tab_container`}>
@@ -512,7 +534,7 @@ const Beckman = () => {
                             <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", }}>
                                 <div style={{ display: "flex", flexDirection: "column" }}>
                                     <span>Bắt đầu từ</span>
-                                    <input style={{ width: "100px" }} type="text" min={0} value={BeckmanminNumber} onChange={(e) => setBeckmanMinNumber(e.target.value)}></input>
+                                    <input style={{ width: "100px" }} type="text" min={0} value={BeckmanminNumber} onChange={(e)=>handleChangeMinNumber(e.target.value)}></input>
                                     {!error1 && <span >SEQ: {convertToFiveDigitString(BeckmanminNumber)} - {reverseConvert(convertToFiveDigitString(BeckmanminNumber))} </span>}
                                 </div>
                                 <div style={{ display: "flex", flexDirection: "column" }}>
