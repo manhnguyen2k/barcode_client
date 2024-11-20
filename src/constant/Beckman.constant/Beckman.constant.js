@@ -21,5 +21,6 @@ const beckmanMethodMap1 = {
     '820': { name: 'TBIL', month: 18 },
     '821': { name: 'TC', month: 18 },
     '822': { name: 'TG', month: 18 },
+    '823': { name: 'GLU HK', month: 18 },
 }
 export default beckmanMethodMap1
