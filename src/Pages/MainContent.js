@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Fruno from "../Screens/Fruno";
 import Beckman from "../Screens/Beckman";
 import Fruno_new from "../Screens/Fruno_new";
+import Jeol from "../Screens/Jeol";
 const MainContent = () => {
     const [selectedMachine, setSelectedMachine] = useState("fruno_new");
     useEffect(() => { console.log(selectedMachine)  }, [selectedMachine]);
@@ -14,12 +15,14 @@ const MainContent = () => {
                 <option value={"fruno_new"}>Fruno mới</option>
                 <option value={"fruno_old"}>Fruno cũ</option>
                 <option value={"beckman"}>Beckman</option>
+                <option value={"jeol"}>Jeol</option>
             </select>
             </div>
            
-            {selectedMachine === "fruno_new" && <Fruno_new />}
-            {selectedMachine === "fruno_old" && <Fruno />}
-            {selectedMachine === "beckman" && <Beckman />}
+            {selectedMachine == "fruno_new" && <Fruno_new />}
+            {selectedMachine == "fruno_old" && <Fruno />}
+            {selectedMachine == "beckman" && <Beckman />}
+            {selectedMachine == "jeol" && <Jeol />}
         </div>
     )
 }

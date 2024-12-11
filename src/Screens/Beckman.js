@@ -83,7 +83,6 @@ const Beckman = () => {
             const res = await BeckmanGenator(dataUncheck)
             setLoading(false);
             if (res) {
-
                 const data = transformArray(res.data.checkedcodes);
                 const ws = XLSX.utils.json_to_sheet(data);
                 const wb = XLSX.utils.book_new();
@@ -190,12 +189,12 @@ const Beckman = () => {
         setMonthProduce(month)
         setYearProduce(year)
     }
+
+
     const handleCopy = (input) => {
         copy(input);
         setIsCopy(true);
     }
-
-
 
 
 
@@ -221,6 +220,8 @@ const Beckman = () => {
             alert("Mã vạch phải đủ 20 kí tự!")
             return
         }
+
+
         try {
             setLoading(true)
             const data = await BeckmanRead(barcode)
@@ -245,6 +246,8 @@ const Beckman = () => {
         }
 
     }
+
+
     useEffect(() => {
         if (parseInt(BeckmanNumber) > 32999) {
             setError(true)
@@ -252,6 +255,8 @@ const Beckman = () => {
             setError(false)
         }
     }, [BeckmanNumber])
+
+
     useEffect(() => {
         if (parseInt(BeckmanmaxNumber) > 32999 || parseInt(BeckmanminNumber) > 32999) {
             setError1(true)
@@ -298,8 +303,6 @@ const Beckman = () => {
             </div>
 
             <div className="container">
-
-
                 {selectedTab == 1 &&
                     <div className="container_barcode">
                         <div className="barcode_item">
@@ -308,8 +311,6 @@ const Beckman = () => {
                                 {Object.entries(beckmanMethodMap1).map(([code, { name }]) => (
                                     <option key={code} value={code}>{name}</option>
                                 ))}
-
-
                             </select>
                             <span >Code  : {BeckmanmethodCode}  </span>
                             <span >Tháng hết hạn của {getMethodName(BeckmanmethodCode)} : {BeckmanMonth} tháng!</span>
@@ -318,10 +319,7 @@ const Beckman = () => {
                         </div>
                         <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
-
-
                             <select value={BeckmanBottleSize} onChange={(e) => setBeckmanBottleSize(e.target.value)}>
-
                                 <option value={'03'}>70ml</option>
                                 <option value={'05'}>20ml</option>
                             </select>
@@ -357,13 +355,8 @@ const Beckman = () => {
 
 
                         <div className="barcode_item">
-
-
-
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
                             <input type="number" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
-
-
                         </div>
                         <div className="barcode_item" style={{ display: "flex", flexDirection: "column" }}>
                             <div style={{ display: "flex", flexDirection: "row", marginBottom: "10px" }}>
@@ -408,9 +401,6 @@ const Beckman = () => {
                                     <div className="barcode_render_img" >
                                         <LazyLoadComponent delayTime={200}>
 
-                                            {/**
-                     * 
-                     */}
                                             {changeImage == "2" ? (
                                                 <div style={{ width: '250px', height: "60px" }} >
                                                     <div id={`img_code_beckman`}>
@@ -455,9 +445,6 @@ const Beckman = () => {
                             }
 
                         </div>
-
-
-
                     </div>
                 }
                 {selectedTab == 2 &&
@@ -468,16 +455,9 @@ const Beckman = () => {
                                 {Object.entries(beckmanMethodMap1).map(([code, { name }]) => (
                                     <option key={code} value={code}>{name}</option>
                                 ))}
-
-
                             </select>
-
-
-
                             <span >Code  : {BeckmanmethodCode}  </span>
                             <span >Tháng hết hạn của {getMethodName(BeckmanmethodCode)} : {BeckmanMonth} tháng!</span>
-
-
                         </div>
                         {/** <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Bottle size ( Kích cỡ lọ)</span>
@@ -521,13 +501,8 @@ const Beckman = () => {
 
 
                         <div className="barcode_item">
-
-
-
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Lot Number (4 chữ số cuối cùng của lot)</span>
                             <input type="number" value={BeckmanLot} onChange={(e) => setBeckmanLot(e.target.value)}></input>
-
-
                         </div>
                         <div className="barcode_item">
                             <span style={{ fontWeight: "bold", fontSize: "1.2rem" }}>Số SEQ:
@@ -562,6 +537,7 @@ const Beckman = () => {
 
                     </div>
                 }
+
                 {selectedTab == 3 &&
                     <div className="container_barcode">
                         <div className="barcode_item">
@@ -589,9 +565,7 @@ const Beckman = () => {
 
                     </div>
                 }
-
-
-
+                
             </div>
         </div>
     )
@@ -602,10 +576,7 @@ const BeckmanPage = () => {
     const navigate = useNavigate()
     return (
         <div style={{ display: "flex", flexDirection: 'column', marginBottom: "10px" }}>
-
             <span style={{ fontWeight: "bold", fontSize: "1.5rem", marginBottom: "10px" }}>Beckman coulter AU</span>
-
-
             <button style={{ width: "80px", height: "30px", margin: "auto", marginBottom: "20px" }} onClick={() => { navigate('/fruno') }}>Đổi máy</button>
             <Beckman />
 
